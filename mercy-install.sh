@@ -40,7 +40,7 @@ echo "";
 echo "======================================";
 echo "Clone Git Theme Bootstrap 5";
 echo "======================================";
-git clone https://github.com/AKlebeLaravel/bs5-theme.git ./Themes/aklebe_bs5
+git clone https://github.com/AKlebeLaravel/aklebe-bs5-theme.git ./Themes/aklebe_bs5
 
 echo "";
 echo "======================================";
