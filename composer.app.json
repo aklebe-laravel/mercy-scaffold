@@ -1,0 +1,18 @@
+{
+  "name": "aklebe/mercy-scaffold",
+  "type": "project",
+  "description": "Mercy Application Scaffold",
+  "keywords": [
+    "framework",
+    "laravel",
+    "Scaffold",
+    "Boilerplate"
+  ],
+  "license": "MIT",
+  "require": {
+  },
+  "require-dev": {
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

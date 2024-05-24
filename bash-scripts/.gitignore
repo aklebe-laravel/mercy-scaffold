@@ -1,0 +1,7 @@
+/.idea
+/env/*
+!/env/*.example
+!/env/*.default
+!/env/*.default.sh
+
+
