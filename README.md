@@ -42,7 +42,7 @@ Follow this steps to install this scaffold:
    MODULE_DEPLOYENV_MAKE_MODULE_AUTHOR_NAME="John Doe"
    MODULE_DEPLOYENV_MAKE_MODULE_AUTHOR_EMAIL="john.doe@localhost.test"
    MODULE_DEPLOYENV_MAKE_MODULE_COMPOSER_VENDOR_NAME="john-doe-laravel"
-   MODULE_DEPLOYENV_REQUIRE_MODULES_GIT="https://github.com:${{module_vendor_name}}/${{module_snake_name_git}}.git"
+   MODULE_DEPLOYENV_REQUIRE_MODULES_GIT="https://github.com/${{module_vendor_name}}/${{module_snake_name_git}}.git"
    MODULE_DEPLOYENV_REQUIRE_MODULES_DEFAULT_VENDOR="AKlebeLaravel"
    ```
 
