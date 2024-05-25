@@ -7,10 +7,11 @@ Documentation: https://laravelmodules.com/docs/v11/introduction
 
 ### Technical Features
 
-- Up to date in base dependencies: Laravel 11, PHP 8.2, Bootstrap 5, for npm 10.7
-- (Module ACL) ACL Permissions and User groups stored in DB
-- (Module DataTable) Self-made datatables using Livewire, Alpine.js, Bootstrap 5
-- (Module DeployEnv) Automatic Deployment/Terraforming with configured data like seeding
+- Up to date in base dependencies: Laravel 11, PHP 8.2, Bootstrap 5, npm 10.7
+- [Module ACL](https://github.com/aklebe-laravel/acl-module) ACL Permissions and User groups stored in DB
+- [Module DataTable](https://github.com/aklebe-laravel/data-table-module) Self-made datatables using Livewire, Alpine.js, Bootstrap 5
+- [Module Form](https://github.com/aklebe-laravel/form-module) Use easy configured forms
+- [Module DeployEnv](https://github.com/aklebe-laravel/deploy-env-module) Automatic Deployment/Terraforming with configured data like seeding
 - Merging multiple composer.json files on different locations like /Modules/* and /Themes/*
 
 ### Installation
@@ -18,7 +19,8 @@ Documentation: https://laravelmodules.com/docs/v11/introduction
 By default, 6 modules should be installed to become a decent toolkit for a website:
 SystemBase, DeployEnv, Acl, Form, DataTable, WebsiteBase.
 The modules SystemBase and DeployEnv are required for every project.
-Follow this steps to install this scaffold:
+
+Follow this steps to install Mercy Scaffold:
 
 1) Change into your new application directory and checkout the mercy app scaffold:
    ```
