@@ -18,8 +18,6 @@
 .env.stage-*
 .phpunit.result.cache
 /modules_statuses.json
-/Modules
-/Themes
 /env-boot-config.php
 Homestead.json
 Homestead.yaml
