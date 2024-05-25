@@ -69,9 +69,10 @@ function f_output_system_info() {
   f_output_line_separator_big
   echo -e "$1\r"
   f_output_line_separator_big
-  f_output_decent "The following config was generated in 'env/system.sh':"
-  f_output_info "Env Config:\t\t\t$destination_env_system > $mercy_deploy_mode"
+  f_output_decent "Generated data from '.env' to 'env/system.sh':"
+  f_output_info "App Name:\t\t\t$destination_app_name"
   f_output_info "App Root:\t\t\t$destination_mercy_root_path"
+  f_output_info "Env Config:\t\t\t$destination_env_system > $mercy_deploy_mode"
   f_output_info "Destination Database Name:\t$destination_db_name"
   f_output_info "Destination Database User:\t$destination_db_user"
   f_output_info "Composer usage:\t\t\t$composer_executable"
