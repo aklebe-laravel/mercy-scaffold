@@ -28,19 +28,19 @@ echo "";
 echo "======================================";
 echo "Clone Git Module SystemBase";
 echo "======================================";
-git clone https://github.com/AKlebeLaravel/system-base-module.git ./Modules/SystemBase
+git clone https://github.com/aklebe-laravel/system-base-module.git ./Modules/SystemBase
 
 echo "";
 echo "======================================";
 echo "Clone Git Module DeployEnv";
 echo "======================================";
-git clone https://github.com/AKlebeLaravel/deploy-env-module.git ./Modules/DeployEnv
+git clone https://github.com/aklebe-laravel/deploy-env-module.git ./Modules/DeployEnv
 
 echo "";
 echo "======================================";
 echo "Clone Git Theme Bootstrap 5";
 echo "======================================";
-git clone https://github.com/AKlebeLaravel/aklebe-bs5-theme.git ./Themes/aklebe_bs5
+git clone https://github.com/aklebe-laravel/aklebe-bs5-theme.git ./Themes/aklebe_bs5
 
 echo "";
 echo "======================================";

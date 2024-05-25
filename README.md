@@ -22,7 +22,7 @@ Follow this steps to install this scaffold:
 
 1) Change into your new application directory and checkout the mercy app scaffold:
    ```
-   git clone https://github.com/AKlebeLaravel/mercy-scaffold.git .
+   git clone https://github.com/aklebe-laravel/mercy-scaffold.git .
    ```
 
 2) Start Install:
@@ -43,7 +43,7 @@ Follow this steps to install this scaffold:
    MODULE_DEPLOYENV_MAKE_MODULE_AUTHOR_EMAIL="john.doe@localhost.test"
    MODULE_DEPLOYENV_MAKE_MODULE_COMPOSER_VENDOR_NAME="john-doe-laravel"
    MODULE_DEPLOYENV_REQUIRE_MODULES_GIT="https://github.com/${{module_vendor_name}}/${{module_snake_name_git}}.git"
-   MODULE_DEPLOYENV_REQUIRE_MODULES_DEFAULT_VENDOR="AKlebeLaravel"
+   MODULE_DEPLOYENV_REQUIRE_MODULES_DEFAULT_VENDOR="aklebe-laravel"
    ```
 
 4) The following menu provides shorthand update (via git) of your installed and/or configured modules and themes based
