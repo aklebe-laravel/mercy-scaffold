@@ -43,28 +43,28 @@ env_system_file="$PROJECTDIR/env/system.sh"
 # =============================================
 f_output_info ""
 
-f_output_info "Checking system basic settings ..."
+#f_output_info "Checking system basic settings ..."
 f_env_check_system_basics
 if [ $? -eq 0 ]; then
   f_output_success "Basic settings ok."
 else
-  f_output_error "" # error was already printed
+  exit
 fi
 
-f_output_info "Checking location setting ..."
+#f_output_info "Checking location setting ..."
 f_env_check_mercy_location
 if [ $? -eq 0 ]; then
   f_output_success "Location ok."
 else
-  f_output_error "" # error was already printed
+  exit
 fi
 
-f_output_info "Checking DB settings ..."
+#f_output_info "Checking DB settings ..."
 f_env_check_db_settings
 if [ $? -eq 0 ]; then
   f_output_success "DB settings ok."
 else
-  f_output_error "" # error was already printed
+  exit
 fi
 
 magento_deploy_mode_developer=$?
