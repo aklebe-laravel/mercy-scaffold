@@ -1,9 +1,6 @@
-## Mercy - Scaffold
+## Mercy Scaffold
 
-From scratch this application is a scaffold of Laravel 11 with modules and themes.
-
-Modules based on ```nwidart/laravel-modules```, Livewire based on ```mhmiton/laravel-modules-livewire```
-Documentation: https://laravelmodules.com/docs/v11/introduction
+**Mercy Scaffold** is a lightweight laravel scaffold / boilerplate to start your web projects based on modules and themes.
 
 ### Technical Features
 
@@ -13,6 +10,10 @@ Documentation: https://laravelmodules.com/docs/v11/introduction
 - [Module Form](https://github.com/aklebe-laravel/form-module) Use easy configured forms
 - [Module DeployEnv](https://github.com/aklebe-laravel/deploy-env-module) Automatic Deployment/Terraforming with configured data like seeding
 - Merging multiple composer.json files on different locations like /Modules/* and /Themes/*
+
+Modules based on [nwidart/laravel-modules](https://github.com/nWidart/laravel-modules),
+Livewire based on [mhmiton/laravel-modules-livewire](https://github.com/mhmiton/laravel-modules-livewire),
+Themes based on [shipu/themevel](https://github.com/Shipu/themevel)
 
 ### Installation
 
