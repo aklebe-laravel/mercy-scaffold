@@ -68,8 +68,9 @@ git pull || exit
 for d in $fullModulePath/*; do
   if [ -d "$d" ]; then
     f_output_info "Pull Module: $d"
-    cd "$d" || exit
-    git pull || exit
+#    cd "$d" || exit
+#    git pull || exit
+    php artisan deploy-env:require-module "$d"
   fi
 done
 

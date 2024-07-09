@@ -27,7 +27,6 @@ branchToCheckout="master"
 # Read config ...
 # =============================================
 . "$PROJECTDIR/env/system.sh" || exit
-. "$PROJECTDIR/env/git-modules.sh"
 
 # =============================================
 # include functions we need ...

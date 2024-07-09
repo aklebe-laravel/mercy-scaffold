@@ -76,16 +76,18 @@ echo "" # new line
 # pull module
 currentModule="SystemBase"
 f_output_info "Git Update Module $currentModule"
-cd "$fullModulePath/$currentModule" || exit
-git pull || exit
-echo "" # new line
+php artisan deploy-env:require-module "$currentModule"
+#cd "$fullModulePath/$currentModule" || exit
+#git pull || exit
+#echo "" # new line
 
 # pull module
 currentModule="DeployEnv"
 f_output_info "Git Update Module $currentModule"
-cd "$fullModulePath/$currentModule" || exit
-git pull || exit
-echo "" # new line
+php artisan deploy-env:require-module "$currentModule"
+#cd "$fullModulePath/$currentModule" || exit
+#git pull || exit
+#echo "" # new line
 
 # change back to mercy root
 cd "$destination_mercy_root_path" || exit
