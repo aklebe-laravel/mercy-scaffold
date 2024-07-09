@@ -67,10 +67,13 @@ git pull || exit
 # pull module
 for d in $fullModulePath/*; do
   if [ -d "$d" ]; then
-    f_output_info "Pull Module: $d"
-#    cd "$d" || exit
-#    git pull || exit
-    php artisan deploy-env:require-module "$d"
+    # ${foo  <-- from variable foo
+    #   ##   <-- greedy front trim
+    #   *    <-- matches anything
+    #   /    <-- until the last '/'
+    #  }
+    f_output_info "Pull Module: ${d##*/}"
+    php artisan deploy-env:require-module "${d##*/}" || exit
   fi
 done
 
