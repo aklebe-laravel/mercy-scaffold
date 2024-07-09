@@ -73,21 +73,9 @@ echo "" # new line
 # @todo: check also if this script was updated and restart it
 # ...
 
-# pull module
-currentModule="SystemBase"
-f_output_info "Git Update Module $currentModule"
-php artisan deploy-env:require-module "$currentModule"
-#cd "$fullModulePath/$currentModule" || exit
-#git pull || exit
-#echo "" # new line
-
-# pull module
-currentModule="DeployEnv"
-f_output_info "Git Update Module $currentModule"
-php artisan deploy-env:require-module "$currentModule"
-#cd "$fullModulePath/$currentModule" || exit
-#git pull || exit
-#echo "" # new line
+# pull system modules
+f_output_info "Git Update System Modules ..."
+php artisan deploy-env:require-module SystemBase,DeployEnv || exit
 
 # change back to mercy root
 cd "$destination_mercy_root_path" || exit
