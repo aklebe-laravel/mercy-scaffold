@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
@@ -44,22 +46,43 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
     }
+
     /**
      * @return $this
      */
     public function makeWithDefaults(array $attributes): static
     {
         $this->setRawAttributes(array_merge([
-            'name'              => fake()->unique()->name(),
-            'email'             => fake()->unique()->safeEmail(),
+            'name'              => Str::uuid()->toString(),
+            'email'             => Str::uuid()->toString().'@local.test',
             'email_verified_at' => now(),
-            'password'          => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'password'          => '1234567',
         ], $attributes));
 
         return $this;
+    }
+
+    /**
+     * @return Builder
+     */
+    public static function getBuilderFrontendItems(): Builder
+    {
+        return self::query()->frontendItems();
+    }
+
+    /**
+     * scope frontendItems()
+     *
+     * @param  Builder  $query
+     *
+     * @return Builder
+     */
+    public function scopeFrontendItems(Builder $query): Builder
+    {
+        return $query;
     }
 
 }

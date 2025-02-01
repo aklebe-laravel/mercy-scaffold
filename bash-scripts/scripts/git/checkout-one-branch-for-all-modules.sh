@@ -1,6 +1,4 @@
 #!/bin/bash
-#su - hiroki
-
 # =============================================
 # Checking location is the script folder
 # =============================================
@@ -12,11 +10,17 @@ if [[ $BASEDIR != *"git" ]]; then
   exit
 fi
 
+# Argument validation check
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <branchToCheckout>"
+    exit 1
+fi
+
 # =============================================
 # Preparing ...
 # =============================================
-PROJECTDIR="../.."
-branchToCheckout="master"
+PROJECTDIR="$BASEDIR/../.."
+branchToCheckout="$1"
 
 # =============================================
 # Read default values ...
@@ -32,32 +36,55 @@ branchToCheckout="master"
 # include functions we need ...
 # =============================================
 . "$PROJECTDIR/functions/output.sh"
+. "$PROJECTDIR/functions/os.sh"
 . "$PROJECTDIR/functions/confirmation.sh"
 
 # =============================================
 # calculate variables depends on config
 # =============================================
+if [[ -z "$mercyModuleDirectory" ]]; then
+  f_output_error "No module directory defined: '$mercyModuleDirectory'"
+  exit 1
+fi
+if [[ -z "$mercyThemeDirectory" ]]; then
+  f_output_error "No theme directory defined: '$mercyThemeDirectory'"
+  exit 1
+fi
+
 fullModulePath="$destination_mercy_root_path/$mercyModuleDirectory"
+fullThemePath="$destination_mercy_root_path/$mercyThemeDirectory"
 
 # =============================================
 # Confirmation
 # =============================================
-f_confirmation_mercy_root_settings "Checkout branch '$branchToCheckout' for all GIT repositories\nin '$fullModulePath'?"
+f_confirmation_mercy_root_settings "Checkout branch '$branchToCheckout' for all GIT repositories\nin '$fullModulePath' and '$fullThemePath'?"
 [ ! $? -eq 0 ] && { exit 1; } # return not 0 = error and exit
 
 # =============================================
-#
+# App itself
+# =============================================
+if [ -d "$destination_mercy_root_path" ]; then
+  gitFetchAndCheckout "$destination_mercy_root_path" "$branchToCheckout"
+  [ ! $? -eq 0 ] && { exit 1; } # return not 0 = error and exit
+fi
+
+# =============================================
+# Modules
 # =============================================
 for d in $fullModulePath/*; do
   if [ -d "$d" ]; then
-    # check its a git repo
-    if [ -f "$d/.git/config" ]; then
-      echo "$d : git fetch and checkout ..."
-      cd "$d" || exit
-#      git fetch origin "$branchToCheckout"
-#      git checkout "$branchToCheckout"
-      echo "" # new line
-    fi
+    gitFetchAndCheckout "$d" "$branchToCheckout"
+    [ ! $? -eq 0 ] && { exit 1; } # return not 0 = error and exit
+  fi
+done
+
+# =============================================
+# Themes
+# =============================================
+for d in $fullThemePath/*; do
+  if [ -d "$d" ]; then
+    gitFetchAndCheckout "$d" "$branchToCheckout"
+    [ ! $? -eq 0 ] && { exit 1; } # return not 0 = error and exit
   fi
 done
 

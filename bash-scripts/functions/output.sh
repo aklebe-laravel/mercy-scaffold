@@ -1,4 +1,7 @@
 #!/bin/bash
+
+. "$PROJECTDIR/functions/env.sh" || exit
+
 # ======================================================================================================
 # output functions
 #
@@ -61,7 +64,7 @@ function f_output_system_info() {
   f_env_check_mercy_deploy_mode_developer
   mercy_deploy_mode_developer=$?
   if [ $mercy_deploy_mode_developer -eq 0 ]; then
-    mercy_deploy_mode="DEVELOPER"
+    mercy_deploy_mode="DEVELOPER (local,dev,dusk-testing)"
   else
     mercy_deploy_mode="PRODUCTION (composer --no-dev)"
   fi
@@ -73,6 +76,7 @@ function f_output_system_info() {
   f_output_info "App Name:\t\t\t$destination_app_name"
   f_output_info "App Root:\t\t\t$destination_mercy_root_path"
   f_output_info "Env Config:\t\t\t$destination_env_system > $mercy_deploy_mode"
+  f_output_info "Default branch:\t\t\t$defaultBranch"
   f_output_info "Destination Database Name:\t$destination_db_name"
   f_output_info "Destination Database User:\t$destination_db_user"
   f_output_info "Composer usage:\t\t\t$composer_executable"
