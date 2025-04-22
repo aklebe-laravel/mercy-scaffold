@@ -4,6 +4,5 @@
     "DataTable": true,
     "Acl": true,
     "WebsiteBase": true,
-    "DeployEnv": true,
-    "TelegramApi": true
+    "DeployEnv": true
 }

@@ -214,7 +214,7 @@ php artisan dusk
 Test with designer permissions
 
 ```
-https://jumble-sale-03-01.test/test-mail-template
+https://mercy.test/test-mail-template
 ```
 
 ### Useful tools

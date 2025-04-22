@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Exception;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Facades\URL;
 use Intervention\Image\Facades\Image;
@@ -17,7 +18,7 @@ class AppServiceProvider extends BaseServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         // Aliases ...
         $loader = AliasLoader::getInstance();
@@ -33,6 +34,8 @@ class AppServiceProvider extends BaseServiceProvider
             // merge for all modules in 'config/combined-module-xxx.php'
             $this->mergeCombinedConfigs();
         });
+
+        $this->app->register(ScheduleServiceProvider::class);
     }
 
     /**
@@ -40,7 +43,7 @@ class AppServiceProvider extends BaseServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         if (env('FORCE_HTTPS', false)) { // Default value should be false for local server
             URL::forceScheme('https');
@@ -65,7 +68,7 @@ class AppServiceProvider extends BaseServiceProvider
                 if (file_exists($configFullPath)) {
                     $this->mergeConfigFromRecursive($configFullPath, $moduleFoundKey);
                 }
-            } catch (\Exception) {
+            } catch (Exception) {
                 // file not found, ignore it ...
             }
             return true;

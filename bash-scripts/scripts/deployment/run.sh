@@ -17,7 +17,7 @@ fi
 # =============================================
 # Preparing ...
 # =============================================
-PROJECTDIR="../.."
+PROJECTDIR="$BASEDIR/../.."
 
 # =============================================
 # Read default values ...
@@ -34,6 +34,7 @@ PROJECTDIR="../.."
 # =============================================
 . "$PROJECTDIR/functions/output.sh"
 . "$PROJECTDIR/functions/confirmation.sh"
+. "$PROJECTDIR/functions/os.sh"
 . "$PROJECTDIR/functions/mysql.sh"
 . "$PROJECTDIR/functions/env.sh" || exit
 . "$PROJECTDIR/functions/maintenance.sh"
@@ -46,7 +47,7 @@ fullModulePath="$destination_mercy_root_path/$mercyModuleDirectory"
 f_env_check_mercy_deploy_mode_developer
 mercy_deploy_mode_developer=$?
 if [ $mercy_deploy_mode_developer -eq 0 ]; then
-  deploy_env_option="--dev-mode"
+  deploy_env_option="--dev-mode --debug"
 else
   deploy_env_option=""
 fi
@@ -67,7 +68,12 @@ f_maintenance_enable || exit
 
 # app pull
 f_output_info "Git Update App"
-git pull || exit
+#git pull || exit
+gitFetchAndCheckout "$destination_mercy_root_path" "$defaultBranch"
+if [ $? -ne 0 ]; then
+  exit
+fi
+
 echo "" # new line
 
 # @todo: check also if this script was updated and restart it
@@ -75,7 +81,7 @@ echo "" # new line
 
 # pull system modules
 f_output_info "Git Update System Modules ..."
-php artisan deploy-env:require-module SystemBase,DeployEnv || exit
+eval "php artisan deploy-env:require-module SystemBase,DeployEnv $deploy_env_option" || exit
 
 # change back to mercy root
 cd "$destination_mercy_root_path" || exit
@@ -84,8 +90,12 @@ cd "$destination_mercy_root_path" || exit
 if [[ -z "$deploy_env_option" ]]; then
   php artisan deploy-env:require-dependencies || exit
 else
-  php artisan deploy-env:require-dependencies "$deploy_env_option" || exit
+  eval "php artisan deploy-env:require-dependencies $deploy_env_option" || exit
 fi
+
+# generate changelog if not already exists
+f_output_info "Generating changelog ..."
+php artisan website-base:changelog || exit
 
 # enable maintenance
 f_maintenance_disable || exit

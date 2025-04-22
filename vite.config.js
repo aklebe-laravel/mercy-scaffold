@@ -1,7 +1,16 @@
 import {defineConfig} from 'vite';
 import laravel from 'laravel-vite-plugin';
 
+// todo: @import is deprecated, but @use is not working so far
+// todo: "quietDeps: true" at least prevents a lot of extern deprecated warnings
 export default defineConfig({
+    css: {
+        preprocessorOptions: {
+            scss: {
+                quietDeps: true
+            }
+        }
+    },
     plugins: [
         laravel({
             input: [
@@ -13,4 +22,8 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        origin: 'http://localhost',
+        cors: true,
+    }
 });

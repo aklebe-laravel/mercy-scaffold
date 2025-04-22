@@ -89,7 +89,7 @@ function f_env_check_db_settings() {
 # ==========================================================================
 function f_env_check_mercy_deploy_mode_developer() {
 
-  if OUTPUT=$(cat "$destination_mercy_root_path/.env" | grep -P -o "APP_ENV\s*=\s*(local|dev)"); then
+  if OUTPUT=$(cat "$destination_mercy_root_path/.env" | grep -P -o "APP_ENV\s*=\s*(local|dev|dusk-testing)"); then
     return 0
   fi
 

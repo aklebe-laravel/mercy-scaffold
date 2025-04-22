@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Support\Facades\Log;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->booting(function (Application $app) {
@@ -25,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // } else {
         //     // die("not found $envConfigFile");
         // }
-
+        
     })
     ->booted(function (Application $app) {
         // all modules boot() was processed ...
