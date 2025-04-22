@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Exception;
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 use Intervention\Image\Facades\Image;
 use Modules\SystemBase\app\Providers\Base\BaseServiceProvider;
@@ -12,7 +13,6 @@ use Nwidart\Modules\Module;
 
 class AppServiceProvider extends BaseServiceProvider
 {
-
     /**
      * Register any application services.
      *
@@ -45,6 +45,8 @@ class AppServiceProvider extends BaseServiceProvider
      */
     public function boot(): void
     {
+        Carbon::setLocale(config('app.locale'));
+
         if (env('FORCE_HTTPS', false)) { // Default value should be false for local server
             URL::forceScheme('https');
         }

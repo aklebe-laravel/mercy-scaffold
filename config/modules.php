@@ -163,8 +163,6 @@ return [
             'routes'          => ['path' => 'routes', 'generate' => true],
 
             // aklebe
-            'forms'           => ['path' => 'forms', 'generate' => true],
-            'model-forms'     => ['path' => 'app/Forms', 'generate' => true],
             'data-tables'     => ['path' => 'app/Http/Livewire/DataTable', 'generate' => true],
             'livewire-forms'  => ['path' => 'app/Http/Livewire/Form', 'generate' => true],
 

@@ -22,11 +22,11 @@ return [
     | Application Version
     |--------------------------------------------------------------------------
     |
-    |  prepared for version ... idk if its needed this way, better read from git?
+    |  prepared for version ... not sure if its needed this way
     |
     */
 
-    'version' => '1.0.2',
+    'version' => '1.1.0',
 
     /*
     |--------------------------------------------------------------------------
