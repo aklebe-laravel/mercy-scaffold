@@ -26,6 +26,7 @@ Follow this steps to install Mercy Scaffold:
 1) Change into your new application directory and checkout the mercy app scaffold:
    ```
    git clone https://github.com/aklebe-laravel/mercy-scaffold.git .
+   git checkout stable
    ```
 
 2) Start Install:
