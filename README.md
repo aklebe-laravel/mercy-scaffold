@@ -43,14 +43,25 @@ Follow this steps to install Mercy Scaffold:
    DB_DATABASE=xxx
    DB_USERNAME=xxx
    DB_PASSWORD=xxx
+   
+   # default settings for required modules
+   MODULE_DEPLOYENV_REQUIRE_MODULES_GIT="https://github.com/${{module_vendor_name}}/${{module_snake_name_git}}.git"
+   MODULE_DEPLOYENV_REQUIRE_MODULES_DEFAULT_VENDOR="aklebe-laravel"
+
+   # settings for your own modules
    MODULE_DEPLOYENV_MAKE_MODULE_AUTHOR_NAME="John Doe"
    MODULE_DEPLOYENV_MAKE_MODULE_AUTHOR_EMAIL="john.doe@localhost.test"
    MODULE_DEPLOYENV_MAKE_MODULE_COMPOSER_VENDOR_NAME="john-doe-laravel"
-   MODULE_DEPLOYENV_REQUIRE_MODULES_GIT="https://github.com/${{module_vendor_name}}/${{module_snake_name_git}}.git"
-   MODULE_DEPLOYENV_REQUIRE_MODULES_DEFAULT_VENDOR="aklebe-laravel"
    ```
+   
+4) Optionally if you use sail/docker
+   - adjust the docker .env variables below ```# ======= Docker stuff =======```
+   - optionally create sail shorthand like ```echo "alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'" >> ~/.bashrc```
+   - install sail: ```php artisan sail:install --devcontainer```
+   - do a first ```composer update```
+   - from now use all commands prefixed with ```sail ``` (like ```sail composer update```) or enter the docker shell using ```sail shell``` 
 
-4) The following menu provides shorthand update (via git) of your installed and/or configured modules and themes based
+5) The following menu provides shorthand update (via git) of your installed and/or configured modules and themes based
    on the config ```config/mercy-dependencies.php```. While run this (implicit with --no-interaction), you do not
    need to care about ```composer update```, ```php artisan migrate```
    and ```php artisan deploy-env:terraform-modules```. So execute the following script and choose ```[u]``` for system
