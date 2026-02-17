@@ -31,10 +31,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // all modules boot() was processed ...
     })
     ->withRouting(web: __DIR__.'/../routes/web.php', commands: __DIR__.'/../routes/console.php', health: '/up',)
-    ->withMiddleware(function (Middleware $middleware) {
-        // ...
-    })
     ->withExceptions(function (Exceptions $exceptions) {
         // ...
-    })
-    ->create();
+    })->withMiddleware(function (Middleware $middleware) {
+        if ($trusted = env('TRUSTED_PROXIES')) {
+            $middleware->trustProxies(at: $trusted);
+        }
+    })->create();

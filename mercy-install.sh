@@ -54,11 +54,11 @@ echo "Starting composer update";
 echo "======================================";
 composer update
 
-echo "";
-echo "======================================";
-echo "Starting npm update";
-echo "======================================";
-npm update
+#echo "";
+#echo "======================================";
+#echo "Starting npm update";
+#echo "======================================";
+#npm update
 
 echo "";
 echo "======================================";

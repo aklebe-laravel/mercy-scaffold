@@ -16,6 +16,7 @@ Livewire based on [mhmiton/laravel-modules-livewire](https://github.com/mhmiton/
 Themes based on [shipu/themevel](https://github.com/Shipu/themevel)
 
 ### Prerequisite
+
 - Composer 2.9
 - PHP 8.5 with extensions curl and zip (```sudo apt install php8.5-curl php8.5-zip```)
 - *Recommended to use the docker method below*
@@ -26,13 +27,11 @@ By default, 6 modules should be installed to become a decent toolkit for a websi
 SystemBase, DeployEnv, Acl, Form, DataTable, WebsiteBase.
 The modules SystemBase and DeployEnv are required for every project.
 
-
 #### Follow this steps to install Mercy Scaffold:
 
 1) Change into your new application directory and checkout the mercy app scaffold:
    ```
    git clone https://github.com/aklebe-laravel/mercy-scaffold.git .
-   git checkout stable
    ```
 
 2) Start Install:
@@ -59,30 +58,39 @@ The modules SystemBase and DeployEnv are required for every project.
    MODULE_DEPLOYENV_MAKE_MODULE_AUTHOR_EMAIL="john.doe@localhost.test"
    MODULE_DEPLOYENV_MAKE_MODULE_COMPOSER_VENDOR_NAME="john-doe-laravel"
    ```
-   
+
 4) Optionally if you use sail/docker:
-   - adjust the docker variables in your .env below ```# ======= Docker stuff =======```
-   - optionally create sail shorthand like ```echo "alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'" >> ~/.bashrc```
-   - install sail: ```php artisan sail:install --devcontainer```
-     - sail will also adjust your .env if needed
-   - from now use all commands prefixed with ```sail ``` (like ```sail composer update```) or enter the docker shell using ```sail shell```
-   - start docker ```sail up -d```
+    - adjust the docker variables in your .env below ```# ======= Docker stuff =======``` - especially the ports to prevent conflict with different projects
+    - Setup docker
+      ```
+      # optionally create sail shorthand
+      echo "alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'" >> ~/.bashrc
+      
+      # install sail (will also adjust your .env if needed)
+      # we recommened to chose mariaDb, redis and mailPit
+      php artisan sail:install --devcontainer
+      
+      # from now use all commands prefixed with sail (like 'sail composer update') or enter the docker shell using 'sail shell'
+ 
+      # start docker
+      sail up -d
+      ```
 
 5) update:
    ```
-   # use in sail shell
+   # use in sail shell, press "u" in menu
    ./ui.sh
    ```
    Description: The following menu (by ./ui.sh) provides shorthand update (via git) of your installed and/or configured modules and themes based
    on the config ```config/mercy-dependencies.php```. While run this (implicit with --no-interaction), you do not
    need to care about ```composer update```, ```php artisan migrate```
    and ```php artisan deploy-env:terraform-modules```. So execute the following script and choose ```[u]``` for system
-   
+
    Troubleshooting:
-   ```./ui.sh``` runs ```php artisan deploy-env:update-bash``` at very first to update ```system.sh``` 
+   ```./ui.sh``` runs ```php artisan deploy-env:update-bash``` at very first to update ```system.sh```
    based on ```.env```. If you have errors from artisan but ```system.sh``` was properly generated before,
    you can run ```./ui.sh -n``` to avoid the update-bash. But don't do it by default.
-   
+
 ### Updates / Rebuilds
 
 #### (Pre-)Update (externals)
