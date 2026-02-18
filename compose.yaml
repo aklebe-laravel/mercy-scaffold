@@ -1,6 +1,6 @@
 services:
     laravel.test:
-        container_name: '${APP_DOMAIN:-laravel.test}'
+        container_name: '${APP_DOMAIN}' # used by NPM (Nginx Proxy Manager)
         build:
             context: ./vendor/laravel/sail/runtimes/8.5
             dockerfile: Dockerfile
@@ -11,42 +11,25 @@ services:
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
+            - '${APP_PORT:-80}:80'
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         environment:
             WWWUSER: '${WWWUSER}'
+            APP_DOMAIN: '${APP_DOMAIN}'
             LARAVEL_SAIL: 1
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
             - '.:/var/www/html'
-            - './docker/nginx/nginx.conf:/etc/nginx/nginx.conf'
-            - './docker/nginx/ssl:/etc/nginx/ssl'
             - './docker/8.5/php.ini:/etc/php/8.5/cli/conf.d/99-sail.ini'
         networks:
             - sail
+            - proxy-gateway # used by NPM (Nginx Proxy Manager)
         depends_on:
             - mariadb
             - redis
             - mailpit
-    nginx:
-        image: 'nginx:stable-alpine'
-        ports:
-            - '${APP_PORT:-80}:80'
-            - '443:443'
-        volumes:
-            - './docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
-            - './docker/nginx/ssl:/etc/nginx/ssl:ro'
-            - '.:/var/www/html'
-        networks:
-            - sail
-        depends_on:
-            - laravel.test
-        environment:
-            - APP_PORT=80
-            - 'SSL_DOMAIN=${SSL_DOMAIN}'
-            - 'SSL_ALT_NAME=${SSL_ALT_NAME}'
-            - APP_SERVICE=laravel.test
     mariadb:
         image: 'mariadb:11'
         ports:
@@ -96,6 +79,8 @@ services:
 networks:
     sail:
         driver: bridge
+    proxy-gateway:
+        external: true # Use global network created for NPM
 volumes:
     sail-mariadb:
         driver: local

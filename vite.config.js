@@ -23,14 +23,14 @@ export default defineConfig({
     server: {
         hmr: {
             host: process.env.APP_DOMAIN,
-            protocol: 'wss', // Wichtig für SSL
+            clientPort: 443, // NPM to 443
+            protocol: 'wss', // Important for SSL
         },
-        // Falls du Vite direkt über den Browser aufrufen musst:
         host: '0.0.0.0',
         watch: {
             usePolling: true,
         },
         port: process.env.VITE_PORT ? parseInt(process.env.VITE_PORT) : 5173,
-        strictPort: true, // Verhindert, dass Vite automatisch auf den nächsten Port ausweicht
+        strictPort: true,
     }
 });
