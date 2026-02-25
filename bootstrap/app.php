@@ -30,7 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->booted(function (Application $app) {
         // all modules boot() was processed ...
     })
-    ->withRouting(web: __DIR__.'/../routes/web.php', commands: __DIR__.'/../routes/console.php', health: '/up',)
+    ->withRouting(web: __DIR__.'/../routes/web.php', commands: __DIR__.'/../routes/console.php',
+        channels: __DIR__.'/../routes/channels.php', health: '/up',)
     ->withExceptions(function (Exceptions $exceptions) {
         // ...
     })->withMiddleware(function (Middleware $middleware) {

@@ -24,7 +24,6 @@
         "nwidart/laravel-modules": "11.*",
         "opcodesio/log-viewer": "3.*",
         "predis/predis": "3.*",
-        "pusher/pusher-php-server": "7.*",
         "shipu/themevel": "3.*",
         "spatie/laravel-backup": "9.*",
         "spatie/laravel-navigation": "*",
