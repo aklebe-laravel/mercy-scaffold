@@ -1,0 +1,45 @@
+# .syncignore - Transport Filter
+
+# Modules and themes will be deployed after rsync
+Modules/
+themes/
+
+# Vite / Laravel artifacts
+public/hot
+
+# Recursion Protection (CRITICAL)
+storage/docker-builds/
+
+# Heavy Source Folders & Git
+node_modules/
+vendor/
+.git/
+.github/
+
+# Development Tools & Caches
+.idea/
+.vscode/
+.phpunit.result.cache
+tests/
+
+# OS Trash & Secrets (Prevents copying local secrets to build folder)
+.DS_Store
+Thumbs.db
+.env.local
+.env.testing
+.env.development
+
+# Laravel Runtime Data (Drastically reduces sync payload)
+storage/logs/*
+storage/debugbar/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/*.key
+
+# Specific App Subfolders (Instead of blocking storage/app/* entirely)
+storage/app/last-setup/*
+storage/app/imports/module-deploy-env/*
+
+# Bootstrap Cache files (Keep directory structure)
+bootstrap/cache/*

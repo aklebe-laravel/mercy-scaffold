@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_ROOT=/var/www/html
+SSH_SRC=/tmp/host-ssh          # read-only bind mount from the Docker host
+SSH_DST=/home/sail/.ssh
+
+# --- PHP-FPM runtime directory ------------------------------------------------
+mkdir -p /var/run/php
+chown -R sail:sail /var/run/php
+# Remove stale sockets from a previous run before FPM boots
+rm -f /var/run/php/*.sock
+
+# --- Align the sail UID with the host user ------------------------------------
+# Only when it differs, so bind-mounted files stay writable from the container.
+if [ -n "${WWWUSER:-}" ] && [ "$WWWUSER" != "$(id -u sail)" ]; then
+    usermod -u "$WWWUSER" sail || echo "WARN: could not change sail UID to $WWWUSER" >&2
+fi
+
+# --- Environment specific setup -----------------------------------------------
+if [ "${APP_ENV:-}" != "production" ]; then
+    # Development: shared composer cache
+    mkdir -p /.composer
+    chmod -R ugo+rw /.composer || true
+else
+    # Production: fix mounted volume permissions on every boot
+    chown -R sail:sail "$APP_ROOT/storage" "$APP_ROOT/bootstrap/cache" || true
+    chmod -R 775 "$APP_ROOT/storage" "$APP_ROOT/bootstrap/cache" || true
+fi
+
+# --- SSH access to external Git hosts -----------------------------------------
+# The host provides known_hosts + deploy key read-only. ssh reads known_hosts
+# directly from the mount (host changes are visible without a restart); only the
+# private key is copied, because ssh requires strict ownership and mode (600).
+setup_ssh() {
+    if [ -z "$(ls -A "$SSH_SRC" 2>/dev/null)" ]; then
+        echo "WARN: $SSH_SRC is missing or empty - SSH access to external hosts is disabled." >&2
+        return 0
+    fi
+
+    install -d -m 700 -o sail -g sail "$SSH_DST"
+
+    local use_key=0
+    if [ -f "$SSH_SRC/id_ed25519" ]; then
+        install -m 600 -o sail -g sail "$SSH_SRC/id_ed25519" "$SSH_DST/id_ed25519"
+        if [ -f "$SSH_SRC/id_ed25519.pub" ]; then
+            install -m 644 -o sail -g sail "$SSH_SRC/id_ed25519.pub" "$SSH_DST/id_ed25519.pub"
+        fi
+        use_key=1
+    else
+        echo "WARN: no id_ed25519 in $SSH_SRC - only agent/public access possible." >&2
+    fi
+
+    {
+        echo "Host *"
+        echo "    StrictHostKeyChecking yes"
+        echo "    UserKnownHostsFile $SSH_SRC/known_hosts"
+        if [ "$use_key" = 1 ]; then
+            echo "    IdentityFile $SSH_DST/id_ed25519"
+            echo "    IdentitiesOnly yes"
+        fi
+    } > "$SSH_DST/config"
+    chown sail:sail "$SSH_DST/config"
+    chmod 600 "$SSH_DST/config"
+
+    # Git url rewrites of the host (written by the installer). Included, not copied,
+    # so changes on the host are visible without a container restart.
+    if [ -f "$SSH_SRC/gitconfig" ]; then
+        gosu sail git config --global include.path "$SSH_SRC/gitconfig"
+    fi
+}
+setup_ssh
+
+# --- Business imports symlink -------------------------------------------------
+# storage/app/imports -> project/business_imports
+# (dev: part of the project bind mount, production: mounted read-only by compose.yaml)
+IMPORTS_LINK="$APP_ROOT/storage/app/imports"
+IMPORTS_TARGET="$APP_ROOT/project/business_imports"
+
+if [ -d "$IMPORTS_TARGET" ]; then
+    # A real directory or mountpoint must never be deleted recursively (on dev it
+    # lives on the host via the project bind mount). Replace it only if empty.
+    if [ -d "$IMPORTS_LINK" ] && [ ! -L "$IMPORTS_LINK" ]; then
+        rmdir "$IMPORTS_LINK" 2>/dev/null \
+            || echo "WARN: $IMPORTS_LINK is a non-empty directory, leaving it untouched." >&2
+    fi
+    if [ ! -e "$IMPORTS_LINK" ] || [ -L "$IMPORTS_LINK" ]; then
+        ln -sfn "$IMPORTS_TARGET" "$IMPORTS_LINK"
+        chown -h sail:sail "$IMPORTS_LINK"
+    fi
+else
+    echo "WARN: $IMPORTS_TARGET does not exist, skipping imports symlink." >&2
+fi
+
+# chown -R does not follow symlinks, so the mounted target stays untouched
+chown -R sail:sail "$APP_ROOT/storage/app" || true
+
+# --- Core execution -----------------------------------------------------------
+if [ $# -gt 0 ]; then
+    exec gosu sail "$@"
+else
+    # Main configuration as defined in the Dockerfile
+    exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
+fi

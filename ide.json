@@ -1,0 +1,321 @@
+{
+    "$schema": "https://laravel-ide.com/schema/laravel-ide-v2.json",
+    "blade": {
+        "components": {
+            "list": [
+                {
+                    "name": "accordion",
+                    "className": "TallStackUi\\Components\\Accordion\\Main\\Component"
+                },
+                {
+                    "name": "accordion.items",
+                    "className": "TallStackUi\\Components\\Accordion\\Items\\Component"
+                },
+                {
+                    "name": "alert",
+                    "className": "TallStackUi\\Components\\Alert\\Component"
+                },
+                {
+                    "name": "autocomplete",
+                    "className": "TallStackUi\\Components\\Form\\Autocomplete\\Component"
+                },
+                {
+                    "name": "back-to-top",
+                    "className": "TallStackUi\\Components\\BackToTop\\Component"
+                },
+                {
+                    "name": "avatar",
+                    "className": "TallStackUi\\Components\\Avatar\\Component"
+                },
+                {
+                    "name": "avatar.group",
+                    "className": "TallStackUi\\Components\\Avatar\\Group\\Component"
+                },
+                {
+                    "name": "badge",
+                    "className": "TallStackUi\\Components\\Badge\\Component"
+                },
+                {
+                    "name": "banner",
+                    "className": "TallStackUi\\Components\\Banner\\Component"
+                },
+                {
+                    "name": "breadcrumbs",
+                    "className": "TallStackUi\\Components\\Breadcrumbs\\Component"
+                },
+                {
+                    "name": "boolean",
+                    "className": "TallStackUi\\Components\\Boolean\\Component"
+                },
+                {
+                    "name": "button",
+                    "className": "TallStackUi\\Components\\Button\\Normal\\Component"
+                },
+                {
+                    "name": "button.circle",
+                    "className": "TallStackUi\\Components\\Button\\Circle\\Component"
+                },
+                {
+                    "name": "button.group",
+                    "className": "TallStackUi\\Components\\Button\\Group\\Component"
+                },
+                {
+                    "name": "calendar",
+                    "className": "TallStackUi\\Components\\Calendar\\Component"
+                },
+                {
+                    "name": "carousel",
+                    "className": "TallStackUi\\Components\\Carousel\\Component"
+                },
+                {
+                    "name": "card",
+                    "className": "TallStackUi\\Components\\Card\\Component"
+                },
+                {
+                    "name": "checkbox",
+                    "className": "TallStackUi\\Components\\Form\\Checkbox\\Component"
+                },
+                {
+                    "name": "color",
+                    "className": "TallStackUi\\Components\\Form\\Color\\Component"
+                },
+                {
+                    "name": "clipboard",
+                    "className": "TallStackUi\\Components\\Clipboard\\Component"
+                },
+                {
+                    "name": "command-palette",
+                    "className": "TallStackUi\\Components\\CommandPalette\\Component"
+                },
+                {
+                    "name": "currency",
+                    "className": "TallStackUi\\Components\\Form\\Currency\\Component"
+                },
+                {
+                    "name": "date",
+                    "className": "TallStackUi\\Components\\Form\\Date\\Component"
+                },
+                {
+                    "name": "dialog",
+                    "className": "TallStackUi\\Components\\Dialog\\Component"
+                },
+                {
+                    "name": "dial",
+                    "className": "TallStackUi\\Components\\Dial\\Main\\Component"
+                },
+                {
+                    "name": "dial.items",
+                    "className": "TallStackUi\\Components\\Dial\\Items\\Component"
+                },
+                {
+                    "name": "dropdown",
+                    "className": "TallStackUi\\Components\\Dropdown\\Main\\Component"
+                },
+                {
+                    "name": "dropdown.items",
+                    "className": "TallStackUi\\Components\\Dropdown\\Items\\Component"
+                },
+                {
+                    "name": "dropdown.submenu",
+                    "className": "TallStackUi\\Components\\Dropdown\\Submenu\\Component"
+                },
+                {
+                    "name": "environment",
+                    "className": "TallStackUi\\Components\\Environment\\Component"
+                },
+                {
+                    "name": "error",
+                    "className": "TallStackUi\\Components\\Form\\Error\\Component"
+                },
+                {
+                    "name": "errors",
+                    "className": "TallStackUi\\Components\\Errors\\Component"
+                },
+                {
+                    "name": "hint",
+                    "className": "TallStackUi\\Components\\Form\\Hint\\Component"
+                },
+                {
+                    "name": "icon",
+                    "className": "TallStackUi\\Components\\Icon\\Component"
+                },
+                {
+                    "name": "input",
+                    "className": "TallStackUi\\Components\\Form\\Input\\Component"
+                },
+                {
+                    "name": "input.select",
+                    "className": "TallStackUi\\Components\\Form\\InputSelect\\Component"
+                },
+                {
+                    "name": "label",
+                    "className": "TallStackUi\\Components\\Form\\Label\\Component"
+                },
+                {
+                    "name": "layout",
+                    "className": "TallStackUi\\Components\\Layout\\Main\\Component"
+                },
+                {
+                    "name": "layout.header",
+                    "className": "TallStackUi\\Components\\Layout\\Header\\Component"
+                },
+                {
+                    "name": "link",
+                    "className": "TallStackUi\\Components\\Link\\Component"
+                },
+                {
+                    "name": "list",
+                    "className": "TallStackUi\\Components\\List\\Main\\Component"
+                },
+                {
+                    "name": "list.items",
+                    "className": "TallStackUi\\Components\\List\\Items\\Component"
+                },
+                {
+                    "name": "loading",
+                    "className": "TallStackUi\\Components\\Loading\\Component"
+                },
+                {
+                    "name": "kbd",
+                    "className": "TallStackUi\\Components\\Kbd\\Component"
+                },
+                {
+                    "name": "key-value",
+                    "className": "TallStackUi\\Components\\KeyValue\\Component"
+                },
+                {
+                    "name": "modal",
+                    "className": "TallStackUi\\Components\\Modal\\Component"
+                },
+                {
+                    "name": "number",
+                    "className": "TallStackUi\\Components\\Form\\Number\\Component"
+                },
+                {
+                    "name": "password",
+                    "className": "TallStackUi\\Components\\Form\\Password\\Component"
+                },
+                {
+                    "name": "pin",
+                    "className": "TallStackUi\\Components\\Form\\Pin\\Component"
+                },
+                {
+                    "name": "progress",
+                    "className": "TallStackUi\\Components\\Progress\\Bar\\Component"
+                },
+                {
+                    "name": "progress.circle",
+                    "className": "TallStackUi\\Components\\Progress\\Circle\\Component"
+                },
+                {
+                    "name": "radio",
+                    "className": "TallStackUi\\Components\\Form\\Radio\\Component"
+                },
+                {
+                    "name": "range",
+                    "className": "TallStackUi\\Components\\Form\\Range\\Component"
+                },
+                {
+                    "name": "rating",
+                    "className": "TallStackUi\\Components\\Rating\\Component"
+                },
+                {
+                    "name": "side-bar",
+                    "className": "TallStackUi\\Components\\Layout\\SideBar\\Main\\Component"
+                },
+                {
+                    "name": "side-bar.item",
+                    "className": "TallStackUi\\Components\\Layout\\SideBar\\Item\\Component"
+                },
+                {
+                    "name": "side-bar.separator",
+                    "className": "TallStackUi\\Components\\Layout\\SideBar\\Separator\\Component"
+                },
+                {
+                    "name": "select.native",
+                    "className": "TallStackUi\\Components\\Form\\Select\\Native\\Component"
+                },
+                {
+                    "name": "select.styled",
+                    "className": "TallStackUi\\Components\\Form\\Select\\Styled\\Component"
+                },
+                {
+                    "name": "signature",
+                    "className": "TallStackUi\\Components\\Signature\\Component"
+                },
+                {
+                    "name": "slide",
+                    "className": "TallStackUi\\Components\\Slide\\Component"
+                },
+                {
+                    "name": "stats",
+                    "className": "TallStackUi\\Components\\Stats\\Component"
+                },
+                {
+                    "name": "step",
+                    "className": "TallStackUi\\Components\\Step\\Main\\Component"
+                },
+                {
+                    "name": "step.items",
+                    "className": "TallStackUi\\Components\\Step\\Items\\Component"
+                },
+                {
+                    "name": "tab",
+                    "className": "TallStackUi\\Components\\Tab\\Main\\Component"
+                },
+                {
+                    "name": "tag",
+                    "className": "TallStackUi\\Components\\Form\\Tag\\Component"
+                },
+                {
+                    "name": "table",
+                    "className": "TallStackUi\\Components\\Table\\Component"
+                },
+                {
+                    "name": "tab.items",
+                    "className": "TallStackUi\\Components\\Tab\\Items\\Component"
+                },
+                {
+                    "name": "textarea",
+                    "className": "TallStackUi\\Components\\Form\\Textarea\\Component"
+                },
+                {
+                    "name": "theme-switch",
+                    "className": "TallStackUi\\Components\\ThemeSwitch\\Component"
+                },
+                {
+                    "name": "time",
+                    "className": "TallStackUi\\Components\\Form\\Time\\Component"
+                },
+                {
+                    "name": "timeline",
+                    "className": "TallStackUi\\Components\\Timeline\\Main\\Component"
+                },
+                {
+                    "name": "timeline.items",
+                    "className": "TallStackUi\\Components\\Timeline\\Items\\Component"
+                },
+                {
+                    "name": "toast",
+                    "className": "TallStackUi\\Components\\Toast\\Component"
+                },
+                {
+                    "name": "toggle",
+                    "className": "TallStackUi\\Components\\Form\\Toggle\\Component"
+                },
+                {
+                    "name": "tooltip",
+                    "className": "TallStackUi\\Components\\Tooltip\\Component"
+                },
+                {
+                    "name": "upload",
+                    "className": "TallStackUi\\Components\\Form\\Upload\\Component"
+                },
+                {
+                    "name": "reaction",
+                    "className": "TallStackUi\\Components\\Reaction\\Component"
+                }
+            ]
+        }
+    }
+}

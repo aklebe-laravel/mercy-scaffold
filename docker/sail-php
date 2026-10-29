@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+#
+# Wrapper, der PhpStorm-CLI-Aufrufe (z. B. "php -v", PHPUnit, "Reload phpinfo")
+# an den laufenden Laravel-Sail-Container weiterreicht. Löst den
+# Zielcontainer über den Compose-Service-Namen auf, daher unabhängig vom
+# tatsächlichen Containernamen/-ID nach einem Rebuild.
+#
+# Ablage-Ort: <projekt>/docker/sail-php
+
+set -uo pipefail   # bewusst OHNE "-e": Fehler sollen sichtbar werden,
+                    # nicht das Skript stumm abbrechen lassen
+
+export DOCKER_CLI_HINTS=false
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+SERVICE="mercy.app"
+CONTAINER_ROOT="/var/www/html"
+
+cd "$PROJECT_ROOT" || { echo "Konnte nicht ins Projektverzeichnis wechseln: $PROJECT_ROOT" >&2; exit 1; }
+
+if [ -z "$(docker compose --ansi never ps -q "$SERVICE" 2>&1)" ]; then
+  echo "Fehler: Service '$SERVICE' nicht gestartet." >&2
+  exit 1;
+
+#    if ! docker compose --ansi never up -d "$SERVICE" >&2; then
+#        echo "Fehler: Konnte Service '$SERVICE' nicht starten." >&2
+#        exit 1
+#    fi
+fi
+
+ARGS=()
+for arg in "$@"; do
+    if [[ "$arg" == "$PROJECT_ROOT"* ]]; then
+        ARGS+=("${CONTAINER_ROOT}${arg#$PROJECT_ROOT}")
+    elif [ -f "$arg" ]; then
+        base="$(basename "$arg")"
+        tmp_path="/tmp/phpstorm-helper-$$-$base"
+        if ! docker compose --ansi never cp "$arg" "$SERVICE:$tmp_path" >&2; then
+            echo "Fehler: Konnte $arg nicht in den Container kopieren (docker compose cp)." >&2
+            exit 1
+        fi
+        ARGS+=("$tmp_path")
+    else
+        ARGS+=("$arg")
+    fi
+done
+
+# Run as "sail" like "sail artisan" does. As root, files created by the IDE (logs, caches)
+# would belong to root and later break "sail artisan test" with permission errors.
+exec docker compose --ansi never exec -T --user sail "$SERVICE" php "${ARGS[@]}"

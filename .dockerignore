@@ -1,0 +1,38 @@
+# .dockerignore - Image Content Filter
+
+# SSH deploy keys (CRITICAL: never bake keys into an image)
+docker/.ssh/
+
+# Infrastructure & Build Config (Do not bake deployment scripts into image)
+.dockerignore
+.syncignore
+auth.json
+
+# Secrets (CRITICAL: NEVER bake production or local envs into image)
+.env
+.env.*
+!.env.minimal
+
+# Project repository: configs, secrets and business imports never belong to the image
+project/
+
+# Git metadata (the exact source state is documented in build.lock.yaml)
+.git
+**/.git
+#node_modules
+
+# Bootstrap Cache (Safety net if files were generated during build steps)
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+
+# Laravel Runtime Data Safety Nets
+storage/logs/*
+storage/debugbar/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/*.key
+
+# Isolate storage/app (Accept mercy-generated, block any leaked temp data)
+storage/app/*
+!storage/app/mercy-generated/

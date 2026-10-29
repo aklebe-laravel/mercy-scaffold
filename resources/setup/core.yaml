@@ -1,0 +1,18 @@
+# =====================================================================
+# Mercy core
+# Cloned by the installer and the build before anything else, because
+# "artisan mercy:app require" (which clones all other modules) lives in DeployEnv.
+#
+# This file belongs to the scaffold version. It is NOT copied to
+# storage/app/last-setup, projects do not change it.
+# =====================================================================
+core:
+  # Git repo names (<git.source>:<git.namespace>/<name>.git).
+  # The folder is derived from the name ("system-base-module" -> "Modules/SystemBase"),
+  # use "directory" only if it differs.
+  modules:
+    - name: system-base-module
+    - name: deploy-env-module
+
+  # Theme used if "requires" in setup.yaml contains no theme.
+  default_theme: mercy-blank-theme

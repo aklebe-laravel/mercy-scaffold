@@ -1,0 +1,31 @@
+# Base config of the product, versioned. Only what differs from the Mercy defaults:
+# every key with its default and an explanation is in vendor/aklebe-laravel/mercy-php-deployment/resources/defaults/setup.yaml,
+# "php mercy.php config --all" shows them all, "--redundant" the values here that equal a default.
+#
+# Layers: Mercy defaults -> setup.yaml -> networks/*.yaml -> <stage>.yaml -> secrets.yaml (not versioned)
+kernel:
+  # docker image (if "image" is not set) and container prefix
+  name: "my-product"
+  # image: "my-product-web"
+  # theme: "my-theme"
+
+git:
+  # owner of the product image in the registry: ghcr.io/<registry_namespace>/<image>:<version>
+  registry_namespace: "my-org"
+
+# Own list of modules and themes (replaces the default list as a whole), e.g.:
+# requires:
+#   - vendor: "aklebe-laravel"
+#     type: "module"
+#     branch: "master"
+#     dev_mode: true
+#     branch_prefix: "dev-"
+#     repository: 'git@github.com:${{module_vendor_name}}/${{module_snake_name_git}}.git'
+#     names: [ "system-base-module", "deploy-env-module", "website-base-module", "acl-module", "data-table-module", "form-module" ]
+#   - vendor: "aklebe-laravel"
+#     type: "theme"
+#     ...
+
+# Settings of your project or its modules, written 1:1 into the .env:
+# env:
+#   MY_MODULE_API_URL: "https://api.example.com"

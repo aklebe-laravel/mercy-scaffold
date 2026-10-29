@@ -1,0 +1,8 @@
+# Dev environment (php mercy.php install|update in the scaffold): only the differences.
+# extends: [ setup.yaml ]   (default) - in your network: [ setup.yaml, networks/home.yaml ]
+kernel:
+  # domain of this instance, without http:// (differs per instance on the same host)
+  domain: "mercy.dev.my-domain.de"
+# several instances on one machine: different port ranges
+# provisioning:
+#   auto_port_start: 27100

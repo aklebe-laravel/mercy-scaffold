@@ -1,0 +1,62 @@
+# --- Laravel Core ---
+/vendor/
+/node_modules/
+/public/build
+/public/hot
+/public/storage
+/storage/logs/*.log
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/docker-builds/*
+/build.lock.yaml
+/env-boot-config.php
+*.log
+.DS_Store
+Thumbs.db
+/storage/*.key
+/storage/pail
+/.zed
+/.nova
+
+# Keep directory structure in storage
+!/storage/logs/.gitignore
+!/storage/framework/.gitignore
+!/storage/framework/cache/.gitignore
+!/storage/framework/sessions/.gitignore
+!/storage/framework/views/.gitignore
+
+# --- Environment / Secrets ---
+.env
+.env.*
+!.env.example
+auth.json
+
+# --- External Assets / Modular Architecture ---
+/Modules/
+/themes/
+# project repository (own git repo, see README "Project repository")
+/project/
+/public/themes
+
+# --- Tools & IDEs ---
+/.idea/
+/.vscode/
+/.fleet/
+/.phpunit.cache/
+/.phpunit.result.cache
+/.phpstorm.meta.php
+/_ide_helper.php
+/_ide_helper_models.php
+/_stages_data_
+npm-debug.log
+yarn-error.log
+
+# --- Project Specific ---
+# home vpn script
+/vpn-sync.sh
+# remove modules statuses becaus its project specific
+/modules_statuses.json
+# remove locks because they have module specific depenencies
+#/composer.lock
+#/package-lock.json

@@ -1,0 +1,32 @@
+# Settings of one network (site), shared by all instances there. An instance uses it:
+#   config/instances/<name>.yaml:  extends: [ ../networks/example.yaml ]
+# Only what differs from the Mercy defaults (github.com, no proxy, no LDAP).
+
+# Own git server that mirrors GitHub: "install"/"update"/"build" set the git rewrites and known_hosts.
+# git:
+#   url_rewrites:
+#     - base: "gitea@git.example.com:aklebe-laravel/"
+#       instead_of: [ "https://github.com/aklebe-laravel/", "git@github.com:aklebe-laravel/" ]
+# ssh:
+#   known_hosts: [ github.com, git.example.com ]
+#   fingerprints:
+#     git.example.com: 'SHA256:...'   # on the server: ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+
+# DNS of the containers
+# net:
+#   dns1: "192.0.2.1"
+
+# Nginx Proxy Manager of this network (password in secrets.yaml)
+# npm:
+#   enabled: true
+#   url: "https://npm.example.com/api"
+#   user: "admin@example.com"
+#   forward: host        # proxy on another machine; "network" for a proxy container on the same machine
+
+# LDAP of this network (password in secrets.yaml)
+# ldap:
+#   enabled: true
+#   host: "192.0.2.6"
+#   username: "cn=ldap-search-user,ou=users,dc=example,dc=com"
+#   base_dn: "dc=example,dc=com"
+#   users_allowed_from_groups: "Members"
