@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bc0e83701399e2f3e06b3f057bf057b5",
+    "content-hash": "e970224894c7017ecf84f08f39aaf2f8",
     "packages": [
         {
             "name": "aklebe-laravel/mercy-php-deployment",
-            "version": "dev-master",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aklebe-laravel/mercy-php-deployment.git",
-                "reference": "34dfcbf7f0712dd7acc084990fa400c14b37f280"
+                "reference": "325b09a46c0678be6ce0d16b28528a4b1893aff8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aklebe-laravel/mercy-php-deployment/zipball/34dfcbf7f0712dd7acc084990fa400c14b37f280",
-                "reference": "34dfcbf7f0712dd7acc084990fa400c14b37f280",
+                "url": "https://api.github.com/repos/aklebe-laravel/mercy-php-deployment/zipball/325b09a46c0678be6ce0d16b28528a4b1893aff8",
+                "reference": "325b09a46c0678be6ce0d16b28528a4b1893aff8",
                 "shasum": ""
             },
             "require": {
@@ -36,8 +36,12 @@
             "suggest": {
                 "ext-zip": "Needed to create a bundle (build_steps.create_bundle)."
             },
-            "default-branch": true,
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "AklebeLaravel\\MercyPhpDeployment\\": "src/"
@@ -52,7 +56,7 @@
                 "MIT"
             ],
             "description": "Isolated deployment for your main application.",
-            "time": "2026-10-29T07:34:42+00:00"
+            "time": "2026-10-29T09:50:33+00:00"
         },
         {
             "name": "alizharb/laravel-themer",
@@ -2501,16 +2505,16 @@
         },
         {
             "name": "composer/semver",
-            "version": "3.5.2",
+            "version": "3.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/semver.git",
-                "reference": "9dfce66f1e97360ea5e6d3e38ab14277e4cc591e"
+                "reference": "d92543b7ede9c4ec6b59853cefb061e39866d2cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/semver/zipball/9dfce66f1e97360ea5e6d3e38ab14277e4cc591e",
-                "reference": "9dfce66f1e97360ea5e6d3e38ab14277e4cc591e",
+                "url": "https://api.github.com/repos/composer/semver/zipball/d92543b7ede9c4ec6b59853cefb061e39866d2cf",
+                "reference": "d92543b7ede9c4ec6b59853cefb061e39866d2cf",
                 "shasum": ""
             },
             "require": {
@@ -2562,7 +2566,7 @@
             "support": {
                 "irc": "ircs://irc.libera.chat:6697/composer",
                 "issues": "https://github.com/composer/semver/issues",
-                "source": "https://github.com/composer/semver/tree/3.5.2"
+                "source": "https://github.com/composer/semver/tree/3.6.0"
             },
             "funding": [
                 {
@@ -2574,7 +2578,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-22T15:37:26+00:00"
+            "time": "2026-10-29T09:13:34+00:00"
         },
         {
             "name": "czproject/git-php",
@@ -17243,9 +17247,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "aklebe-laravel/mercy-php-deployment": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
