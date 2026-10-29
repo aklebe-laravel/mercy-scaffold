@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types = 1);
+
+/*
+ * Mercy CLI of the dev environment: ./mercy install | update | build | config | host:setup | ...
+ * (also "php mercy ..."; tab completion only with "./mercy", see README)
+ */
+
+require __DIR__.'/vendor/autoload.php';
+
+use AklebeLaravel\MercyPhpDeployment\MercyApp;
+
+$dest = __DIR__;
+new MercyApp($dest, $dest.'/resources/setup', $dest.'/storage/app/last-setup')
+        // the project repository "project/" holds the configs (see README "Project")
+        ->withProject($dest.'/project', [
+                'dev'   => 'setup.yaml',
+                'build' => 'setup-build.yaml',
+        ])
+        // "./mercy build": the production image is built in its own folder
+        ->withBuild($dest.'/storage/docker-builds/prod-build')
+        ->runDev();

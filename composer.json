@@ -21,7 +21,7 @@
         "ext-gd": "*",
         "ext-pdo": "*",
         "ext-sodium": "*",
-        "aklebe-laravel/mercy-php-deployment": "^2.0",
+        "aklebe-laravel/mercy-php-deployment": "^2.1",
         "alizharb/laravel-themer": "^1.4",
         "blade-ui-kit/blade-heroicons": "^2.6",
         "blade-ui-kit/blade-icons": "^1.9",

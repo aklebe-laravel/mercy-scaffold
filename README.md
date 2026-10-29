@@ -44,8 +44,7 @@ The default theme is `mercy-blank`.
 
 | Path                      | Meaning                                                                            |
 |---------------------------|------------------------------------------------------------------------------------|
-| `mercy.php`               | dev installer: `php mercy.php install`                                             |
-| `build.php`               | builds the production image: `php build.php create`                                |
+| `mercy`                   | dev tool: `./mercy install`, `update`, `build`, `config`, ...                      |
 | `project/`                | **your project repository**: configs and business imports, see [Project](#project) |
 | `resources/setup/`        | templates of the scaffold: new project, `setup-*.env`, `.env.minimal`, `core.yaml` |
 | `storage/app/last-setup/` | generated: merged configs and envs of this machine, never edit (not in git)        |
@@ -66,7 +65,7 @@ Installed on your machine:
   The production build checks the host PHP version, it has to match the image (8.5).
 - Node.js 22 with npm, only for the production build (`npm ci` and `npm run build` run on the host)
 - An SSH key with access to your git server (to clone modules/themes), see `ssh` in `setup.yaml`.
-  The install prepares git and ssh of this machine itself (step `setup_host`, also `php mercy.php host:setup`):
+  The install prepares git and ssh of this machine itself (step `setup_host`, also `./mercy host:setup`):
   it creates a missing deploy key, adds the hosts of `ssh.known_hosts` to `~/.ssh/known_hosts` (only with a known
   fingerprint, github.com is built in) and tests the access. The only manual step: add the shown public key at the git server.
 - _[Optional]_ Nginx Proxy Manager, see `npm` in `setup.yaml`. The app container joins the Docker network
@@ -114,16 +113,18 @@ build on this machine (the deployment sets `GIT_SSH_COMMAND`). Your own git comm
       ```
       git clone <your-project-repo> project
       ```
-    - new project: `composer install && php mercy.php project:init`, then edit the files in `project/config/`
+    - new project: `composer install && ./mercy project:init`, then edit the files in `project/config/`
     - `composer install` in a fresh checkout only installs the deployment tool: it skips `artisan package:discover`
-      until `php mercy.php install` has cloned the core modules (message "Mercy core modules are not installed yet")
+      until `./mercy install` has cloned the core modules (message "Mercy core modules are not installed yet")
 3) Install
    ```
    composer install
-   php mercy.php install
+   ./mercy install
    ```
-   Show all steps by `php mercy.php install --info`. Continue at a specific step (after an error)
-   by `php mercy.php install 12` (step number or name).
+   Show all steps by `./mercy install --info`. Continue at a specific step (after an error)
+   by `./mercy install 12` (step number or name).
+   `./mercy` works like Laravel's `artisan`, also as `php mercy`. The install sets up tab completion (bash):
+   in a new terminal `./mercy install --instance=<tab>` (only with `./mercy`, not with `php mercy`).
 
 The install runs these steps: copy root files, prepare `.env.minimal`, copy the SSH files for Docker,
 clone base modules and theme, composer update, create `.env` (from `setup-local.env`), build and start the
@@ -148,7 +149,7 @@ the LDAP sync has already created. On production use `docker compose exec mercy.
 ### Project
 
 Everything that makes your project different from the scaffold lives in **one folder, `project/`**, an own (private) git repository. The scaffold ignores it and stays generic.
-`php mercy.php project:init` creates a new
+`./mercy project:init` creates a new
 one from the template in `resources/setup/project/`.
 
 ```
@@ -181,18 +182,18 @@ kernel:
   version: "2.0.1"
 ```
 
-A stage file without `extends` inherits `setup.yaml`. `php mercy.php config` shows the chain and the origin
+A stage file without `extends` inherits `setup.yaml`. `./mercy config` shows the chain and the origin
 of every value.
 
-Before every command `php mercy.php` writes the dev stage to `storage/app/last-setup/setup.yaml` and the
+Before every command `./mercy` writes the dev stage to `storage/app/last-setup/setup.yaml` and the
 build stage to `setup-build.yaml`, so **edit the project, never the generated files**.
 
 One place to look at the result, with the origin of every value (secrets masked):
 
 ```
-php mercy.php config                 # dev stage
-php mercy.php config npm --stage=build
-php mercy.php config --all           # also the keys of the template that are not set
+./mercy config                 # dev stage
+./mercy config npm --stage=build
+./mercy config --all           # also the keys of the template that are not set
 ```
 
 ### Config files
@@ -365,13 +366,13 @@ relation types, `raw_sql`, `artisan`, ...) are described in the
 ### Build the image for production
 
 Set the release number in `project/config/build.yaml` first (`kernel.version`, e.g. `2.0.1-rc1`),
-check `git` and `build_steps` (`php build.php config --stage=build`). Then run **in your dev folder** (takes several minutes):
+check `git` and `build_steps` (`./mercy config --stage=build`). Then run **in your dev folder** (takes several minutes):
 
 ```
-php build.php create
+./mercy build
 ```
 
-Like the install, `php build.php create --info` lists the steps and `php build.php create <step>` continues at a step.
+Like the install, `./mercy build --info` lists the steps and `./mercy build <step>` continues at a step.
 
 The build runs in `storage/docker-builds/prod-build`:
 
@@ -427,10 +428,10 @@ Recommended `/etc/docker/daemon.json`:
 
 ```
 # containers, networks and volumes (the DATABASE) of this folder, images built here
-php mercy.php destroy
+./mercy destroy
 
 # also the pulled images (app image, mariadb, redis) and/or all files of the folder
-php mercy.php destroy --images --files
+./mercy destroy --images --files
 ```
 
 `destroy` uses the docker project name of the `.env` and asks you to type it. With `--files` it refuses

@@ -1,7 +1,7 @@
 # My Project
 
 Project repository for a [Mercy Scaffold](https://github.com/aklebe-laravel/mercy-scaffold) application:
-everything that makes this project different from the scaffold. Created by `php mercy.php project:init`.
+everything that makes this project different from the scaffold. Created by `./mercy project:init`.
 
 | Path                  | Meaning                                                         |
 |-----------------------|-----------------------------------------------------------------|
@@ -28,7 +28,7 @@ Show the effective config and where each value comes from (`--all` also the Merc
 `--redundant` the values here that equal a default and can be removed):
 
 ```
-php mercy.php config [filter] [--stage=dev|build|prod] [--all] [--redundant]
+./mercy config [filter] [--stage=dev|build|prod] [--all] [--redundant]
 ```
 
 ## Instances
@@ -49,9 +49,9 @@ provisioning:
 Choose it once per installation, it is remembered in `project/.instance` (not versioned):
 
 ```
-php mercy.php install --instance=vm-dev
-php mercy.php update                    # uses vm-dev
-php mercy.php config --instance=vm-prod # only a look at another instance
+./mercy install --instance=vm-dev
+./mercy update                    # uses vm-dev
+./mercy config --instance=vm-prod # only a look at another instance
 ```
 
 Order: Mercy defaults → `setup.yaml` → `<stage>.yaml` → the instance (with its network) → `secrets.yaml`.
@@ -59,11 +59,11 @@ As soon as `config/instances/` has files, every command needs an instance (no ru
 
 ## Dev
 
-Clone this repository as `project/` into the scaffold folder, create `config/secrets.yaml`, then `php mercy.php install`.
+Clone this repository as `project/` into the scaffold folder, create `config/secrets.yaml`, then `./mercy install`.
 
 ## Production
 
-Clone it as `project/` into the Mercy-Installer folder, create `config/secrets.yaml`, then `php mercy.php install`.
-Later: `git -C project pull && php mercy.php update`.
+Clone it as `project/` into the Mercy-Installer folder, create `config/secrets.yaml`, then `./mercy install`.
+Later: `git -C project pull && ./mercy update`.
 
 Keep a copy of the secret files in your password manager, they exist only on the machines.

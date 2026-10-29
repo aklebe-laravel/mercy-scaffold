@@ -1,7 +1,7 @@
-# Production server (php mercy.php install|update in the Mercy-Installer): only the differences.
+# Production server (./mercy install|update in the Mercy-Installer): only the differences.
 # extends: [ setup.yaml ]   (default) - in your network: [ setup.yaml, networks/home.yaml ]
 kernel:
   # domain of this instance, without http://
   domain: "mercy.my-domain.de"
-  # the release to run (image tag); change it and run "php mercy.php update" to switch releases
+  # the release to run (image tag); change it and run "./mercy update" to switch releases
   version: "2.0.0"

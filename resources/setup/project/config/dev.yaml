@@ -1,4 +1,4 @@
-# Dev environment (php mercy.php install|update in the scaffold): only the differences.
+# Dev environment (./mercy install|update in the scaffold): only the differences.
 # extends: [ setup.yaml ]   (default) - in your network: [ setup.yaml, networks/home.yaml ]
 kernel:
   # domain of this instance, without http:// (differs per instance on the same host)

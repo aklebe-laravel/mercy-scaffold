@@ -1,4 +1,4 @@
-# Production image (php build.php create): only the differences to the dev stage.
+# Production image (./mercy build): only the differences to the dev stage.
 # The image can be rolled out to any domain, so it is built with the dev values (domain, ports),
 # never with the domain of a production instance.
 # env "production" and dev_mode false come from the Mercy build defaults (set them here again if your dev.yaml sets them).

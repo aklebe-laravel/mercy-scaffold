@@ -4,7 +4,7 @@
 #   base        PHP + nginx + supervisor + Composer + Node + Git/SSH.
 #
 #   production  Packs the FINISHED build folder into the image. The folder is
-#               assembled beforehand by build.php (vendor, modules, frontend build).
+#               assembled beforehand by "./mercy build" (vendor, modules, frontend build).
 #               There is no SSH, no .env and no module sync in this Dockerfile.
 #               Everything that must not end up in the image (.env, .git,
 #               node_modules, storage/app, ...) belongs into the .dockerignore.

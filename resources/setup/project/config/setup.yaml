@@ -1,6 +1,6 @@
 # Base config of the product, versioned. Only what differs from the Mercy defaults:
 # every key with its default and an explanation is in vendor/aklebe-laravel/mercy-php-deployment/resources/defaults/setup.yaml,
-# "php mercy.php config --all" shows them all, "--redundant" the values here that equal a default.
+# "./mercy config --all" shows them all, "--redundant" the values here that equal a default.
 #
 # Layers: Mercy defaults -> setup.yaml -> networks/*.yaml -> <stage>.yaml -> secrets.yaml (not versioned)
 kernel:

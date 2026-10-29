@@ -33,7 +33,7 @@ services:
       # business imports of the project repository, same path as on dev (start-container links storage/app/imports)
       - './project/business_imports:/var/www/html/project/business_imports:ro'
       # No SSH in production: the image already contains all modules and themes.
-      # Modules are only updated by building and pulling a new image ("php mercy.php update").
+      # Modules are only updated by building and pulling a new image ("./mercy update").
       # Running "mercy:app require/update" inside a production container would change code that
       # is not part of a volume: it is lost on the next container recreate and differs from the image.
     networks:
