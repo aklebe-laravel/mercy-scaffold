@@ -57,6 +57,19 @@ Choose it once per installation, it is remembered in `project/.instance` (not ve
 Order: Mercy defaults → `setup.yaml` → `<stage>.yaml` → the instance (with its network) → `secrets.yaml`.
 As soon as `config/instances/` has files, every command needs an instance (no run with the wrong config).
 
+## Test branches
+
+Changes of this machine for now go into `config/local.yaml` (not versioned, merged last), e.g. all repos on a feature branch:
+
+```yaml
+git:
+  branch: feature-x                  # every module, theme and mercy-php-deployment that has it
+  branches: { acl-module: feature-y } # single repos (must exist)
+```
+
+Then `./mercy update`. `./mercy` shows the active branches; remove them and run `./mercy update` to go back.
+Do not commit `composer.lock` meanwhile; `./mercy build` refuses to run while test branches are set.
+
 ## Dev
 
 Clone this repository as `project/` into the scaffold folder, create `config/secrets.yaml`, then `./mercy install`.

@@ -60,3 +60,6 @@ yarn-error.log
 # remove locks because they have module specific depenencies
 #/composer.lock
 #/package-lock.json
+
+# written by ./mercy for a test branch of mercy-php-deployment (git.branch in project/config/local.yaml)
+/composer.local.json

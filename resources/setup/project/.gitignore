@@ -3,5 +3,8 @@ secrets.yaml
 *.secrets.yaml
 /business_imports/secrets.php
 
-# the instance of this installation (php mercy.php ... --instance=<name>)
+# the instance of this installation (./mercy ... --instance=<name>)
 /.instance
+
+# changes of this machine for now, e.g. test branches (git.branch)
+/config/local.yaml
