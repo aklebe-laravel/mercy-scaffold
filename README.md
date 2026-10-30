@@ -441,7 +441,8 @@ git:
     mercy-php-deployment: ../MercyPhpDeployment
 ```
 
-`./mercy update` copies it into `vendor` (refresh after changes: `composer reinstall aklebe-laravel/mercy-php-deployment`).
+`./mercy update` copies it into the scaffold (`storage/app/library-branch/`, the container sees only the scaffold);
+after changes in the library: `./mercy library:sync`.
 A pushed library branch instead: `git.branches: { mercy-php-deployment: feature-x }`. Do not commit `composer.lock` meanwhile.
 
 **Test image from a branch** (INT/STAGE, not a release):
