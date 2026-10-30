@@ -61,5 +61,5 @@ yarn-error.log
 #/composer.lock
 #/package-lock.json
 
-# written by ./mercy for a test branch of mercy-php-deployment (git.branch in project/config/local.yaml)
+# written by ./mercy for test branches of the libraries (git.branch in project/config/local.yaml)
 /composer.local.json

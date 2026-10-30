@@ -13,18 +13,15 @@ git:
   # owner of the product image in the registry: ghcr.io/<registry_namespace>/<image>:<version>
   registry_namespace: "my-org"
 
-# Own list of modules and themes (replaces the default list as a whole), e.g.:
+# Your own modules and themes (the Mercy base modules come with the Mercy defaults, released versions), e.g.:
 # requires:
-#   - vendor: "aklebe-laravel"
+#   - vendor: "my-org"
 #     type: "module"
-#     branch: "master"
+#     branch: "master"          # or version: "^1.0" for your released tags
 #     dev_mode: true
 #     branch_prefix: "dev-"
 #     repository: 'git@github.com:${{module_vendor_name}}/${{module_snake_name_git}}.git'
-#     names: [ "system-base-module", "deploy-env-module", "website-base-module", "acl-module", "data-table-module", "form-module" ]
-#   - vendor: "aklebe-laravel"
-#     type: "theme"
-#     ...
+#     names: [ "my-module" ]
 
 # Settings of your project or its modules, written 1:1 into the .env:
 # env:

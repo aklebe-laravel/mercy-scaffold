@@ -104,9 +104,9 @@ build on this machine (the deployment sets `GIT_SSH_COMMAND`). Your own git comm
 
 ### Install the dev environment
 
-1) Clone this project
+1) Clone this project, the latest release (or `master` if you work on Mercy itself, see [Workflows](#workflows))
    ```
-   git clone https://github.com/aklebe-laravel/mercy-scaffold.git .
+   git clone --branch v2.3.0 https://github.com/aklebe-laravel/mercy-scaffold.git .
    ```
 2) **_[Important]_ Your project**
     - existing project: clone your project repository as `project/` and create its `config/secrets.yaml`
@@ -375,10 +375,14 @@ check `git` and `build_steps` (`./mercy config --stage=build`). Then run **in yo
 
 Like the install, `./mercy build --info` lists the steps and `./mercy build <step>` continues at a step.
 
+By default the image is built from **releases**: the latest tag of the scaffold, the versions of `base_requires`
+and `requires`, the libraries of its `composer.lock`. The dev settings of your machine (`local.yaml`) are not used.
+For a test image from a branch see [Workflows](#workflows) (`build_steps.branch`).
+
 The build runs in `storage/docker-builds/prod-build`:
 
 1. check the host PHP version, clean the build folder
-2. git clone the scaffold into the build folder
+2. git clone the scaffold into the build folder (latest tag, or `build_steps.branch`)
 3. use the build stage of your project (`setup-build.yaml`) as `setup.yaml` of the build
 4. check platform requirements, copy root files, create `.env` from `setup-production.env`
 5. fetch base modules and theme, `composer install --no-dev`, fetch `requires` (`mercy:app require`)
@@ -390,6 +394,75 @@ The build runs in `storage/docker-builds/prod-build`:
 11. _[Optional]_ push to the registry (`build_steps.use_registry`)
 
 Business imports are not part of the image, they are provided on the production server.
+
+### Workflows
+
+One rule: **what is checked out in your dev folder stays** (your IDE switches branches). The configs only decide
+what new clones start with, and what the build takes.
+
+| Repo                               | Comes from                                                         | Change it with                                        |
+|------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------|
+| Scaffold, installer                | your `git clone` (tag or branch)                                   | `git checkout` / IDE                                  |
+| Mercy base modules and theme       | `base_requires` of the Mercy defaults: the latest release (`^2.0`) | `git.branch` / `git.branches` in `local.yaml`         |
+| Your modules and themes            | `requires` of your project (`branch: master` or `version: "^1.0"`) | IDE; for new clones `git.branch` / `git.branches`     |
+| Libraries (`mercy-php-deployment`) | `composer.lock` (released tags)                                    | `git.library_paths` or `git.branches` in `local.yaml` |
+| The image (`./mercy build`)        | releases                                                           | `build_steps.branch` (e.g. in an instance)            |
+
+`project/config/local.yaml` is not versioned and belongs to this machine only. `./mercy` shows what is active.
+
+**Build a project on the Mercy releases** (you work on your own modules only):
+
+```bash
+git clone --branch v2.3.0 https://github.com/aklebe-laravel/mercy-scaffold.git . && git clone <your-project> project
+composer install && ./mercy install --instance=dev
+```
+
+Your modules come from `requires` (e.g. `master`), Mercy's from its tags. Feature branch of your module: switch it in the IDE.
+
+**Work on the Mercy base** (all repos on `master`):
+
+```yaml
+# project/config/local.yaml
+git:
+  branch: master
+```
+
+Clone the scaffold (and the installer) from `master`, then `./mercy update`. New clones and clones on a tag move to
+`master`, clones on a branch keep it.
+
+**A feature across several repos** (`feature-x` in a few modules): switch them in the IDE, nothing to configure.
+On a fresh machine or test VM: `git.branch: feature-x` (repos without it take `master` / their release).
+
+**Develop a library next to the project** (its own PhpStorm project, any branch):
+
+```yaml
+git:
+  library_paths:
+    mercy-php-deployment: ../MercyPhpDeployment
+```
+
+`./mercy update` copies it into `vendor` (refresh after changes: `composer reinstall aklebe-laravel/mercy-php-deployment`).
+A pushed library branch instead: `git.branches: { mercy-php-deployment: feature-x }`. Do not commit `composer.lock` meanwhile.
+
+**Test image from a branch** (INT/STAGE, not a release):
+
+```yaml
+# project/config/instances/vm-dev.yaml (the machine that builds)
+build_steps:
+  branch: feature-x
+```
+
+`./mercy build` takes scaffold, modules, themes and libraries from `feature-x` where they have it (the rest from
+`master` / releases) and tags the image `<version>-feature-x`. Run it on the test server with that version in its
+instance (`kernel.version: 2.3.0-feature-x`).
+
+**Release** (Mercy team): push everything, then in `git-scripts`:
+
+```bash
+./bin/mercy-migrate verify                    # which repos are ahead of their latest tag
+./bin/mercy-migrate tag patch --apply         # or minor / major: only repos with new commits get a tag
+composer update aklebe-laravel/mercy-php-deployment   # in scaffold and installer, if the library got one
+```
 
 ### Install on production
 

@@ -57,18 +57,20 @@ Choose it once per installation, it is remembered in `project/.instance` (not ve
 Order: Mercy defaults → `setup.yaml` → `<stage>.yaml` → the instance (with its network) → `secrets.yaml`.
 As soon as `config/instances/` has files, every command needs an instance (no run with the wrong config).
 
-## Test branches
+## Branches and libraries of this machine
 
-Changes of this machine for now go into `config/local.yaml` (not versioned, merged last), e.g. all repos on a feature branch:
+What is checked out stays (your IDE switches branches). `config/local.yaml` (not versioned, merged last) only says
+what new clones and libraries take, e.g.:
 
 ```yaml
 git:
-  branch: feature-x                  # every module, theme and mercy-php-deployment that has it
-  branches: { acl-module: feature-y } # single repos (must exist)
+  branch: master                                      # new clones of modules/themes: unreleased master
+  branches: { acl-module: feature-y }                 # single repos, also libraries (must exist)
+  library_paths: { mercy-php-deployment: ../MercyPhpDeployment }   # your own working copy of a library
 ```
 
-Then `./mercy update`. `./mercy` shows the active branches; remove them and run `./mercy update` to go back.
-Do not commit `composer.lock` meanwhile; `./mercy build` refuses to run while test branches are set.
+Then `./mercy update`; `./mercy` shows what is active. Do not commit `composer.lock` while a library comes from a
+branch or folder. More examples: scaffold README "Workflows".
 
 ## Dev
 
