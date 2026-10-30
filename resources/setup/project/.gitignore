@@ -1,7 +1,6 @@
 # passwords and keys stay on the machines, never in git
 secrets.yaml
 *.secrets.yaml
-/business_imports/secrets.php
 
 # the instance of this installation (./mercy ... --instance=<name>)
 /.instance
