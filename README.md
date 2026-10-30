@@ -1,425 +1,363 @@
-## Mercy Scaffold
+# Mercy Scaffold
 
-[Mercy Scaffold](https://github.com/aklebe-laravel/mercy-scaffold) is a Laravel scaffold to start web projects
-based on **modules** and **themes**: the scaffold provides the environment (Docker, install, build, deployment),
-your logic lives in modules, your layout in themes, your project data in business imports.
+**Mercy** is a modular foundation for Laravel applications. You install a complete dev environment with one
+command, build a production Docker image with a second, and install or update it on a server with a third.
 
-The scaffold itself contains almost no application code. A project made with Mercy is defined by
+The scaffold provides the environment and contains almost no application code. Everything else lives in its own
+repositories:
 
-- its **project repository**, cloned as `project/`: config (name, domain, required modules and themes, ...)
-  and business imports (project-specific database data), see [Project](#project),
-- the modules in `/Modules` and themes in `/themes` (cloned by the setup).
+| Part                                                                           | Contains                                                            |
+|--------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| **Mercy Scaffold** (this repository)                                           | Laravel app shell, Docker setup, the `./mercy` CLI                  |
+| **Modules** (`Modules/`)                                                       | your logic: models, Livewire components, routes, deployments        |
+| **Themes** (`themes/`)                                                         | your layout: Blade views, Tailwind, assets                          |
+| **Project repository** (`project/`)                                            | what makes your product unique: config per stage and instance, data |
+| [mercy-php-deployment](https://github.com/aklebe-laravel/mercy-php-deployment) | the library behind `./mercy`: install, update, build steps          |
+| [mercy-installer](https://github.com/aklebe-laravel/mercy-installer)           | `./mercy install` / `update` of the image on a production server    |
 
-### Features
+A product made with Mercy is therefore **one project repository plus the modules and themes it lists**. The
+scaffold stays generic and can be updated independently of your product.
 
-- Full installation process for your dev environment with one command:
-    - Docker containers: the main app, MariaDB, Redis, Mailpit (dev only)
-    - clone all required modules and themes, composer install
-    - generate `.env`, auto ports (several projects on one machine without port collisions)
-    - create the hosts in Nginx Proxy Manager by API (optional)
-    - migrate and terraform (seed) the deployment data of all modules and your business imports
-    - build the frontend
-- Build a production Docker image and push it to a registry (GitHub, self-hosted Gitea, ...)
-- Install/update on production by the [Mercy-Installer](#install-on-production)
-- Up-to-date stack: Laravel 13, PHP 8.5, Livewire 4, Tailwind v4, Vite, npm workspaces for themes
-- Merges the `composer.json` files of `/Modules/*` and `/themes/*` (wikimedia/composer-merge-plugin)
+## Contents
 
-Base modules:
+- [Features](#features)
+- [Modules and themes](#modules-and-themes)
+- [Requirements](#requirements)
+- [Quick start](#quick-start)
+- [The `./mercy` CLI](#the-mercy-cli)
+- [Project repository](#project-repository)
+- [Business imports](#business-imports)
+- [Workflows](#workflows)
+- [Build the production image](#build-the-production-image)
+- [Production](#production)
+- [Using your own git server](#using-your-own-git-server)
+- [Versions and releases](#versions-and-releases)
+- [Development reference](#development-reference)
+- [Folder structure](#folder-structure)
+- [Maintenance](#maintenance)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
 
-| Module                                                           | Meaning                                                                  |
-|------------------------------------------------------------------|--------------------------------------------------------------------------|
-| SystemBase                                                       | base services, helpers and providers used by all modules                 |
-| [DeployEnv](https://github.com/aklebe-laravel/deploy-env-module) | deployments/terraforming (seeding), business imports, `mercy:*` commands |
-| WebsiteBase                                                      | base of the website (layout, navigation, ...)                            |
-| [Acl](https://github.com/aklebe-laravel/acl-module)              | permissions and user groups stored in the database                       |
-| [DataTable](https://github.com/aklebe-laravel/data-table-module) | datatables using Livewire and Alpine.js                                  |
-| [Form](https://github.com/aklebe-laravel/form-module)            | easy configured forms                                                    |
+## Features
 
-Modules are based on [nwidart/laravel-modules](https://github.com/nWidart/laravel-modules),
-Livewire in modules on [mhmiton/laravel-modules-livewire](https://github.com/mhmiton/laravel-modules-livewire),
-themes on [alizharb/laravel-themer](https://github.com/alizharb/laravel-themer).
-The default theme is `mercy-blank`.
+**Environment**
 
-### Folder structure
+- Complete dev environment with one command (`./mercy install`): app container (PHP 8.5, Nginx, PHP-FPM, Reverb,
+  queue and scheduler under supervisor), MariaDB 11, Redis, Mailpit
+- Modules and themes are cloned and wired automatically; their `composer.json` files are merged into the app (`wikimedia/composer-merge-plugin`), their `docker/supervisord.conf` is included
+- Automatic ports: several projects and instances run side by side on one machine without collisions
+- Optional: proxy hosts and certificates in Nginx Proxy Manager are created and kept up to date by API
+- The machine is prepared by the tool itself (`host:setup`): git rewrites, `known_hosts` checked against
+  fingerprints, deploy key, access test, bash tab completion
 
-| Path                      | Meaning                                                                            |
-|---------------------------|------------------------------------------------------------------------------------|
-| `mercy`                   | dev tool: `./mercy install`, `update`, `build`, `config`, ...                      |
-| `project/`                | **your project repository**: configs and business imports, see [Project](#project) |
-| `resources/setup/`        | templates of the scaffold: new project, `setup-*.env`, `.env.minimal`, `core.yaml` |
-| `storage/app/last-setup/` | generated: merged configs and envs of this machine, never edit (not in git)        |
-| `Modules/`                | modules (cloned by `setup.requires`, enabled in `modules_statuses.json`)           |
-| `themes/`                 | themes (cloned by `setup.requires`, npm workspaces)                                |
-| `install/project-root/`   | files copied to the project root by the installer                                  |
-| `docker/`                 | Dockerfile, nginx/php config and `start-container` of the app container            |
-| `storage/docker-builds/`  | build folder of the production image                                               |
+**Configuration**
 
-### Prerequisites
+- One project repository instead of copied folders: product, network and instance are separate layers
+- Mercy defaults as the lowest layer: project files contain only their differences, new Mercy versions bring new
+  settings without touching a project file
+- Unknown or renamed keys are reported before every command; `./mercy config` shows every value and where it comes from
+- Secrets stay on the machine (not versioned) and are masked in every output
 
-Installed on your machine:
+**Build and deployment**
 
-- Docker with the compose plugin (your user in the group `docker`)
-- Composer 2.9, `git`, `unzip`
-- PHP 8.5 with the extensions curl, zip, mbstring, xml, gd, intl, ldap, bcmath (Ubuntu: PPA `ondrej/php`,
-  `sudo apt install php8.5-cli php8.5-curl php8.5-zip php8.5-mbstring php8.5-xml php8.5-gd php8.5-intl php8.5-ldap php8.5-bcmath`).
-  The production build checks the host PHP version, it has to match the image (8.5).
-- Node.js 22 with npm, only for the production build (`npm ci` and `npm run build` run on the host)
-- An SSH key with access to your git server (to clone modules/themes), see `ssh` in `setup.yaml`.
-  The install prepares git and ssh of this machine itself (step `setup_host`, also `./mercy host:setup`):
-  it creates a missing deploy key, adds the hosts of `ssh.known_hosts` to `~/.ssh/known_hosts` (only with a known
-  fingerprint, github.com is built in) and tests the access. The only manual step: add the shown public key at the git server.
-- _[Optional]_ Nginx Proxy Manager, see `npm` in `setup.yaml`. The app container joins the Docker network
-  `proxy-gateway` (created by the install if missing). `npm.forward: network` for a proxy container in this
-  network, `npm.forward: host` for a proxy on another machine.
-- For a push to a registry: `docker login <registry>` (GitHub: `ghcr.io` with a classic token, `write:packages`)
+- Reproducible production image from releases (tags) or, for test systems, from a branch
+- `build.lock.yaml` in the image: exact commit of the scaffold, every module, theme and library
+- Push to any registry (GitHub `ghcr.io`, Gitea, ...), optional offline bundle
+- Production install and update with the [Mercy-Installer](https://github.com/aklebe-laravel/mercy-installer):
+  switch releases by changing one line
+- Migrations, module deployments and your project data run on every install and update
+- Safe teardown (`./mercy destroy`): asks for confirmation, refuses to delete folders with unpushed git work
 
-Tested on a small VM: Ubuntu 24.04 LTS, 1 CPU core, 2 GiB memory, 32 GB disk (dev install, dev update, production build and push).
+**Stack:** Laravel 13, PHP 8.5, Livewire 4, Tailwind CSS 4, Vite, npm workspaces for themes,
+[nwidart/laravel-modules](https://github.com/nWidart/laravel-modules),
+[mhmiton/laravel-modules-livewire](https://github.com/mhmiton/laravel-modules-livewire),
+[alizharb/laravel-themer](https://github.com/alizharb/laravel-themer).
 
-### Use your own git server (mirror of GitHub)
+## Modules and themes
 
-The code always uses the GitHub urls (`https://github.com/aklebe-laravel/...`, `git@github.com:aklebe-laravel/...`).
-To clone from your own server instead (e.g. a Gitea that mirrors to GitHub), put this into the project config,
-best into the config of your network (e.g. `project/config/networks/home.yaml`), so every instance there gets it:
+All modules and themes are separate repositories in [aklebe-laravel](https://github.com/aklebe-laravel), MIT licensed. **Base** modules come with every installation (released versions,
+see [Workflows](#workflows)); the others are added to
+`requires` of your project.
 
-```yaml
-git:
-  url_rewrites:
-    - base: "gitea@git.example.com:aklebe-laravel/"
-      instead_of:
-        - "https://github.com/aklebe-laravel/"
-        - "git@github.com:aklebe-laravel/"
-ssh:
-  known_hosts:
-    - github.com
-    - git.example.com
-  fingerprints:
-    git.example.com: 'SHA256:...'   # on the server: ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+| Module / theme                                                               | Included | Description                                                                                                             |
+|------------------------------------------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------|
+| [system-base-module](https://github.com/aklebe-laravel/system-base-module)   | core     | foundation for all modules: base service providers and Livewire components, config merging, caching, helpers, schedules |
+| [deploy-env-module](https://github.com/aklebe-laravel/deploy-env-module)     | core     | deployments (seeding) of modules and business imports, `mercy:*` and `deploy-env:*` commands, module generator          |
+| [website-base-module](https://github.com/aklebe-laravel/website-base-module) | base     | multi-store website: navigation, CMS pages, core config in the database, data management of models, notifications       |
+| [acl-module](https://github.com/aklebe-laravel/acl-module)                   | base     | access control: user groups and resources in the database, optional users and groups from LDAP                          |
+| [data-table-module](https://github.com/aklebe-laravel/data-table-module)     | base     | Livewire data tables for models and their relations: sorting, filters, one class per table                              |
+| [form-module](https://github.com/aklebe-laravel/form-module)                 | base     | Livewire forms for models and their relations: element configuration, validation, events                                |
+| [central-ui-module](https://github.com/aklebe-laravel/central-ui-module)     | optional | web desktop for Proxmox: VM cards with status and start/stop, schedules, ACL per VM group, WireGuard peers on pfSense   |
+| [mercy-blank-theme](https://github.com/aklebe-laravel/mercy-blank-theme)     | core     | default theme and parent of project themes (Tailwind 4)                                                                 |
+| [central-ui-theme](https://github.com/aklebe-laravel/central-ui-theme)       | optional | admin theme for central-ui-module, child theme of mercy-blank                                                           |
+
+**Core** modules and the default theme are defined by the scaffold itself (`resources/setup/core.yaml`) and are
+cloned first, because the commands that clone everything else live in DeployEnv. **Base** modules are listed in the
+Mercy defaults (`base_requires`). An entry with the same name in your `requires` wins over both.
+
+Create your own module with `sail artisan deploy-env:make-module MyModule`, see [Development reference](#development-reference).
+An example of a complete product is [proxtop-web](https://github.com/aklebe-proxtop/proxtop-web).
+
+## Requirements
+
+On the machine that runs the dev environment or builds the image:
+
+| Requirement                     | Notes                                                                                                                                    |
+|---------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| Docker with the compose plugin  | your user in the group `docker`                                                                                                          |
+| PHP 8.5 CLI                     | extensions curl, zip, mbstring, xml, gd, intl, ldap, bcmath (Ubuntu: PPA `ondrej/php`). The build checks that it matches the image (8.5) |
+| Composer 2.9, `git`, `unzip`    |                                                                                                                                          |
+| Node.js 22 with npm             | only for `./mercy build` (`npm ci` and `npm run build` run on the host)                                                                  |
+| SSH access to your git server   | the install creates a deploy key if missing and shows it; you add it once at GitHub / your git server                                    |
+| _Optional:_ Nginx Proxy Manager | see `npm` in the [Mercy defaults](https://github.com/aklebe-laravel/mercy-php-deployment/blob/master/resources/defaults/setup.yaml)      |
+| _Optional:_ registry login      | for `./mercy build` with push; the build asks for user and token (GitHub: `ghcr.io`, classic token with `write:packages`)                |
+
+Ubuntu packages for PHP:
+
+```bash
+sudo apt install php8.5-cli php8.5-curl php8.5-zip php8.5-mbstring php8.5-xml php8.5-gd php8.5-intl php8.5-ldap php8.5-bcmath
 ```
 
-Then `install`/`update`/`build` (step `setup_host`) set the git `insteadOf` rewrites in your global git config, add
-the server to `~/.ssh/known_hosts` and test the access. Without `url_rewrites` everything comes from GitHub.
+Tested on Ubuntu 24.04 LTS with 1 CPU core, 2 GiB memory and 32 GB disk (dev install, dev update, build and push).
 
-One key per machine: the deploy key (`ssh.key`). The containers use it, and so do `composer install` and the
-build on this machine (the deployment sets `GIT_SSH_COMMAND`). Your own git commands keep your own ssh key.
+## Quick start
 
-### Install the dev environment
+```bash
+# 1. the scaffold, on its latest release
+git clone https://github.com/aklebe-laravel/mercy-scaffold.git my-app && cd my-app
+git checkout "$(git describe --tags --abbrev=0)"
 
-1) Clone this project, the latest release (or `master` if you work on Mercy itself, see [Workflows](#workflows))
-   ```
-   git clone --branch v2.3.0 https://github.com/aklebe-laravel/mercy-scaffold.git .
-   ```
-2) **_[Important]_ Your project**
-    - existing project: clone your project repository as `project/` and create its `config/secrets.yaml`
-      ```
-      git clone <your-project-repo> project
-      ```
-    - new project: `composer install && ./mercy project:init`, then edit the files in `project/config/`
-    - `composer install` in a fresh checkout only installs the deployment tool: it skips `artisan package:discover`
-      until `./mercy install` has cloned the core modules (message "Mercy core modules are not installed yet")
-3) Install
-   ```
-   composer install
-   ./mercy install
-   ```
-   Show all steps by `./mercy install --info`. Continue at a specific step (after an error)
-   by `./mercy install 12` (step number or name).
-   `./mercy` alone shows where this installation stands and the next step.
-   `./mercy` works like Laravel's `artisan`, also as `php mercy`. The install sets up tab completion (bash):
-   in a new terminal `./mercy install --instance=<tab>` (only with `./mercy`, not with `php mercy`).
+# 2. your project repository as project/ ...
+git clone <your-project-repository> project
+cp project/config/secrets.example.yaml project/config/secrets.yaml   # if your project has one, then fill it in
+# ... or a new project from the template
+composer install && ./mercy project:init
 
-The install runs these steps: copy root files, prepare `.env.minimal`, copy the SSH files for Docker,
-clone base modules and theme, composer update, create `.env` (from `setup-local.env`), build and start the
-containers, `key:generate`, `storage:link`, sync Nginx Proxy Manager, clone `requires`,
-`mercy:app update`, `mercy:app migrate`, health check and finally a summary (`mercy:info`) with URLs and ports.
-
-### After the install
-
-The install contains the data of the modules, but not the data of your project. Typical next steps:
-
+# 3. install
+composer install
+./mercy install                  # with instances: ./mercy install --instance=<name>
 ```
-# 1) users and groups from LDAP (only with ldap.enabled in setup.yaml)
-sail artisan ldap:sync-all
 
-# 2) your business imports (link users to groups, servers, ...), again after changing them
+The install prepares the machine, clones the modules and themes, creates `.env`, builds and starts the containers,
+runs migrations and deployments and ends with a summary of URLs and ports. Open a new terminal afterwards to get
+tab completion (`./mercy install --instance=<tab>`).
+
+Then load your project data:
+
+```bash
+sail artisan ldap:sync-all          # only with ldap.enabled: users and groups first
 sail artisan deploy-env:terraform-modules --module_name=local:business-imports --force
 ```
 
-The order matters if business imports update users with `can_create => false`: they only find users that
-the LDAP sync has already created. On production use `docker compose exec mercy.app php artisan ...` instead of `sail artisan ...`.
+`./mercy` without a command tells you at any time where this installation stands and what to do next.
 
-### Project
+A fresh checkout's `composer install` only installs the deployment tool and skips `artisan package:discover` until
+`./mercy install` has cloned the core modules ("Mercy core modules are not installed yet" is expected).
 
-Everything that makes your project different from the scaffold lives in **one folder, `project/`**, an own (private) git repository. The scaffold ignores it and stays generic.
-`./mercy project:init` creates a new
-one from the template in `resources/setup/project/`.
+## The `./mercy` CLI
+
+`./mercy` works like Laravel's `artisan` (also `php mercy`; tab completion only with `./mercy`).
+
+| Command                   | Purpose                                                                                                    |
+|---------------------------|------------------------------------------------------------------------------------------------------------|
+| `./mercy`                 | status: project, instance, config warnings, secrets, containers, URL and the next step (read only)         |
+| `./mercy install`         | full install of the dev environment                                                                        |
+| `./mercy update`          | refresh an existing dev environment (after `git pull`, config changes, new modules); keeps keys and data   |
+| `./mercy build`           | build the production image, see [Build](#build-the-production-image)                                       |
+| `./mercy config [filter]` | effective config with the origin of every value (`--stage`, `--all`, `--redundant`, `--instance`)          |
+| `./mercy project:init`    | create `project/` from the template                                                                        |
+| `./mercy host:setup`      | prepare git and ssh of this machine (also the first step of install, update, build)                        |
+| `./mercy library:sync`    | refresh a library from your local folder, see [Workflows](#workflows)                                      |
+| `./mercy destroy`         | remove containers, volumes (the database!) and proxy hosts of this folder, see [Maintenance](#maintenance) |
+
+Every command that changes something is a list of named steps:
+
+```bash
+./mercy install --info          # list the steps
+./mercy install 12              # continue at step 12 (number or name), e.g. after fixing an error
+```
+
+Global option `--instance=<name>`: chosen once per installation and remembered in `project/.instance`.
+The step reference of every command is in the
+[mercy-php-deployment README](https://github.com/aklebe-laravel/mercy-php-deployment#commands-and-steps).
+
+## Project repository
+
+Everything that makes your product different lives in **one folder, `project/`**, an own git repository (private if it contains your hosts). The scaffold ignores it. `./mercy project:init` creates one
+from
+`resources/setup/project/`.
 
 ```
 project/
   config/
-    setup.yaml             base config, versioned
-    dev.yaml               only the differences of the dev environment
-    build.yaml             only the differences of the production image (release number)
-    prod.yaml              only the differences of the production server (used by the Mercy-Installer)
-    secrets.yaml           passwords and keys of this machine, NOT versioned
-    <stage>.secrets.yaml   optional, NOT versioned
-  business_imports/        project data, see Business Imports (their secrets: env vars in config/secrets.yaml)
+    setup.yaml               product: name, image, theme, modules, env of modules        (versioned)
+    networks/<name>.yaml     network/site: git server, NPM, LDAP, DNS                    (versioned)
+    instances/<name>.yaml    one installation: domain, ip, ports, release                (versioned)
+    dev.yaml                 differences of the dev stage                                (versioned)
+    build.yaml               differences of the image: release number                    (versioned)
+    prod.yaml                differences of the production stage: release to run         (versioned)
+    secrets.yaml             passwords and tokens of this machine                        (NOT versioned)
+    local.yaml               branches and libraries of this machine                      (NOT versioned)
+  business_imports/          project data, see Business imports
   README.md
 ```
 
-Merge order per stage: `setup.yaml` → `<stage>.yaml` → `secrets.yaml` → `<stage>.secrets.yaml`.
-Maps are merged key by key, lists (like `requires`) are replaced as a whole.
+### Layers
 
-Every yaml can inherit others with `extends` (paths relative to the file, the inherited files come first).
-That separates the three levels of a config: **product** (`setup.yaml`: modules, theme, ...), **network/site** (pfSense, NPM, DNS, LDAP, registry, shared by several instances) and **instance**
-(domain, ports, release, the stage file itself). Keep it at these three levels.
+Every stage (`dev`, `build`, `prod`) merges, from lowest to highest:
+
+1. **Mercy defaults** (`resources/defaults/` of mercy-php-deployment): every key with its default and an explanation
+2. `setup.yaml` and the files it `extends` (e.g. a network)
+3. the stage file (`dev.yaml`, `build.yaml`, `prod.yaml`)
+4. the instance (`instances/<name>.yaml`, usually extends its network)
+5. `secrets.yaml`, `<stage>.secrets.yaml`, `local.yaml`
+
+Maps are merged key by key, lists (like `requires`) are replaced as a whole. Every file can inherit others with
+`extends: [ setup.yaml, networks/home.yaml ]` (paths relative to the file, cycles are an error); a stage file without
+`extends` inherits `setup.yaml`. The build stage extends the dev stage, so an image is never built with the domain
+of a production instance.
+
+Keep the three levels apart: **product** (`setup.yaml`), **network** (`networks/`, shared by all instances there), **instance** (domain, ports, release). A structural change is then made in one place
+and every instance inherits it.
 
 ```yaml
-# project/config/prod.yaml
-extends:
-  - setup.yaml
-  - networks/home.yaml
+# project/config/instances/vm-dev.yaml
+extends: [ ../networks/home.yaml ]
 kernel:
-  domain: "proxtop.example.com"
-  version: "2.0.1"
+  domain: "my-product.dev.example.com"
+  ip: "192.0.2.75"
+provisioning:
+  auto_port_start: 27500        # several instances on one machine: own port range
 ```
 
-A stage file without `extends` inherits `setup.yaml`. `./mercy config` shows the chain and the origin
-of every value.
+As soon as `config/instances/` contains files, every command needs an instance, so nothing ever runs with the wrong
+config. The first line of every command names project, instance and stage.
 
-Before every command `./mercy` writes the dev stage to `storage/app/last-setup/setup.yaml` and the
-build stage to `setup-build.yaml`, so **edit the project, never the generated files**.
+### Inspecting the config
 
-One place to look at the result, with the origin of every value (secrets masked):
-
-```
-./mercy config                 # dev stage
-./mercy config npm --stage=build
-./mercy config --all           # also the keys of the template that are not set
+```bash
+./mercy config                     # dev stage, only the values the project sets
+./mercy config npm --stage=build   # one section of another stage
+./mercy config --all               # including the Mercy defaults
+./mercy config --redundant         # project values that equal a default and can be removed
 ```
 
-### Config files
+Before every command the result is written to `storage/app/last-setup/` (generated, never edit it). Unknown keys (typos, old names) are reported; renamed keys are moved to their new name with a
+warning.
 
-| File                                   | Meaning                                                                           |
-|----------------------------------------|-----------------------------------------------------------------------------------|
-| `project/config/*.yaml`                | your project (kernel name/env/domain/theme, git, ports, requires, npm, ssh, ldap) |
-| `resources/setup/project/`             | template of a new project (`project:init`)                                        |
-| `resources/setup/setup-local.env`      | template of `.env` for the dev environment                                        |
-| `resources/setup/setup-production.env` | template of `.env` for production                                                 |
-| `resources/setup/.env.minimal`         | minimal env (sqlite in memory, array cache) to run artisan during install/build   |
-| `resources/setup/core.yaml`            | Mercy core modules and default theme (belongs to the scaffold version)            |
-| `storage/app/last-setup/`              | generated configs and envs of this machine (ports and keys stay fixed there)      |
+### Secrets
 
-#### Instance identity (project name)
+`secrets.yaml` exists only on the machine. Keep a copy in your password manager. Values that may be versioned (e.g. the
+password of a local dev tool) go into a file ending with `-secrets.yaml` (e.g. `shared-secrets.yaml`), inherited with
+`extends`: masked like secrets, but committed. Never for production secrets.
 
-`APP_INSTANCE_KEY` and `COMPOSE_PROJECT_NAME` are calculated once (from name, domain, git and ports)
-and then **kept**, even if `setup.yaml` changes or `setup-local.env` was deleted (the value is then taken
-from the project's `.env`). Docker volumes (database!) belong to this project name: a new name would start
-a new, empty instance. If the config would give a different value, the install shows a warning.
+### Important sections
 
-To start a really fresh instance on purpose, delete both lines (or the whole file) in `.env`
-and in `storage/app/last-setup/setup-local.env`, then run the install again.
+| Section        | Meaning                                                                                                                                   |
+|----------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| `kernel`       | `name` (container prefix, image), `image`, `domain`, `ip`, `theme`, `version`, `debug`, `dev_mode`                                        |
+| `requires`     | your modules and themes, see [Require modules and themes](https://github.com/aklebe-laravel/deploy-env-module#require-modules-and-themes) |
+| `env`          | free env vars of your project and its modules, written 1:1 into `.env`                                                                    |
+| `git`          | registry of the image, `url_rewrites` for an own git server, branches for development                                                     |
+| `provisioning` | `auto_port_start`: first port of this instance                                                                                            |
+| `npm`          | Nginx Proxy Manager: API, hosts, `forward` (`network` or `host`)                                                                          |
+| `ssh`          | deploy key, known hosts and their fingerprints                                                                                            |
+| `ldap`         | LDAP server of the Acl module                                                                                                             |
+| `build_steps`  | build options: `branch`, `use_registry`, `create_bundle`, ...                                                                             |
 
-Important sections of `setup.yaml`:
+All keys with explanations: [Mercy defaults](https://github.com/aklebe-laravel/mercy-php-deployment/blob/master/resources/defaults/setup.yaml).
 
-- `kernel`: `name` (image name and container prefix), `env`, `domain`, `theme`,
-  `debug` (full console output), `dev_mode` (composer/optimize behaviour)
-- `provisioning.auto_port_start`: use a different start value per project to avoid port collisions
-- `requires`: the modules and themes to clone, see the [DeployEnv README](Modules/DeployEnv/README.md#require-modules-and-themes)
-- `npm`: Nginx Proxy Manager API and hosts (`enabled: false` to skip)
-- `ssh`: deploy key and the known hosts provided to the container
+### Instance identity
 
-#### Versions
+`COMPOSE_PROJECT_NAME`, `APP_INSTANCE_KEY` and the auto ports are calculated on the first install and then **kept**,
+even if the config changes. Docker volumes (the database) belong to the project name, so a new name would mean a new,
+empty instance; the install only warns if the config would give another value. New ports: change
+`provisioning.auto_port_start`. A deliberately fresh instance: remove both keys from `.env` and
+`storage/app/last-setup/setup-local.env`, then install again.
 
-A version belongs to a built image, not to an environment:
+## Business imports
 
-| Where      | Version                                                                                        |
-|------------|------------------------------------------------------------------------------------------------|
-| dev        | no fixed number: `git describe` of this project, e.g. `v2.0.1-rc1-3-g1a2b3c4-dirty`            |
-| build      | `kernel.version` in `project/config/build.yaml`: the release number (image tag, `APP_VERSION`) |
-| production | `kernel.version` in `project/config/prod.yaml`: the release to run                             |
-
-So dev never pretends to be a release. `sail artisan mercy:info` and `APP_VERSION` show what really runs.
-A `kernel.version` in `setup.yaml` or `dev.yaml` would override the git version, keep it in `build.yaml` and `prod.yaml`.
-
-### Dev tools and flows
-
-| Task                                                   | Command                                                                                  |
-|--------------------------------------------------------|------------------------------------------------------------------------------------------|
-| Rebuild containers                                     | `sail build --no-cache`                                                                  |
-| Start containers                                       | `sail up -d`                                                                             |
-| Run Vite dev server                                    | `sail npm run dev`                                                                       |
-| Shell in the app container                             | `sail shell`                                                                             |
-| Update composer, npm, clear caches, build frontend     | `sail artisan mercy:app update`                                                          |
-| Clear caches and views                                 | `sail artisan mercy:app cache,view`                                                      |
-| Build frontend (incl. clear caches)                    | `sail artisan mercy:app build-frontend`                                                  |
-| Clone/update the modules and themes of `requires`      | `sail artisan mercy:app require`                                                         |
-| Migrate and terraform all modules and business imports | `sail artisan mercy:app migrate`                                                         |
-| Dev all in one if many things heappend                 | `sail artisan mercy:app migrate,build-frontend,cache,view`                               |
-| Terraform all modules and business imports (new only)  | `sail artisan deploy-env:terraform-modules`                                              |
-| Run business imports again (after changing your data)  | `sail artisan deploy-env:terraform-modules --module_name=local:business-imports --force` |
-| Important env vars, hosts, ports and URLs              | `sail artisan mercy:info`                                                                |
-| List modules by priority                               | `sail artisan deploy-env:module-info`                                                    |
-
-All `mercy:app` services and `deploy-env:*` commands are described in the [DeployEnv README](Modules/DeployEnv/README.md).
-
-### Create modules, forms and datatables
-
-Create a new module from the stubs of DeployEnv:
-
-```
-sail artisan deploy-env:make-module MyModule
-```
-
-If the modules `Form` and `DataTable` are installed, create the model, form and datatable classes:
-
-```
-sail artisan deploy-env:former MyModule --classes=country,some-thing,AnyThing
-```
-
-This creates per class name (existing files are not changed):
-
-```
-Modules/MyModule/app/Models/Country.php
-Modules/MyModule/app/Forms/Country.php
-Modules/MyModule/app/Http/Livewire/Form/Country.php
-Modules/MyModule/app/Http/Livewire/DataTable/Country.php
-```
-
-Without `--classes`, datatables and forms are created for every model of the module.
-More files can be created by other modules listening to the event `DeployEnvFormer`.
-
-### Business Imports
-
-Business imports are the **project-specific data** of your instance (users and their groups, servers,
-templates, ...). Modules bring their own base data, business imports bring yours, without changing any module.
-They live in the project repository (`project/business_imports`), not in the scaffold and not in the image.
-Secrets used by imports are env vars like all other secrets: set in `project/config/secrets.yaml` under `env`
-(not versioned), mapped in the config of a module (`'token' => env('MY_API_TOKEN')`) and read in the import file
-with `config('my-module.token')`. Not with `env()`: once the config is cached, `env()` returns nothing there.
-
-The folder `project/business_imports` is linked to `storage/app/imports` inside the container:
+Business imports are the **data of your product** (users and their groups, servers, templates, navigation, ...).
+Modules bring their own base data; business imports bring yours, without changing a module. They live in
+`project/business_imports/`, not in the image, and are linked to `storage/app/imports` in the container.
 
 ```
 project/business_imports/
 └── module-deploy-env/
-    ├── a-2026-08-04.php          # import config, any unique name, all files run sorted by name
-    └── 0002/                     # deployment ident used in the config
-        └── models/               # cmd "models"
-            ├── servers.php       # model definition, any unique name
+    ├── a-my-product.php       # import config, any unique name, all files run sorted by name
+    └── 0002/                  # deployment ident used in the config
+        └── models/            # cmd "models"
+            ├── servers.php
             └── users.php
 ```
 
-The import config uses the same format as a module's `config/module-deploy-env.php`:
+The import config has the format of a module's `config/module-deploy-env.php`:
 
 ```php
 return [
     'deployments' => [
         // ident, runs once (like a migration) unless --force
         '0002' => [
-            [
-                'cmd'     => 'models',
-                'sources' => ['servers.php', 'users.php'],
-            ],
+            ['cmd' => 'models', 'sources' => ['servers.php', 'users.php']],
         ],
     ],
 ];
 ```
 
-A model definition finds models by `uniques`, creates/updates them and syncs their relations:
+A model definition finds models by `uniques`, creates or updates them and syncs their relations:
 
 ```php
 return [
     'model'      => \App\Models\User::class,
     'uniques'    => ['name'],
-    'can_create' => false,   // only update users that already exist (like imported by LDAP)
+    'can_create' => false,   // only update users that already exist (e.g. imported from LDAP)
     'can_update' => true,
     'relations'  => [
         'aclGroups' => ['method' => 'aclGroups', 'columns' => 'name', 'auto_delete' => false],
     ],
-    // the key 'data' is required, rows outside of it are ignored
     'data'       => [
         [
-            // multiple users with the same data (comma separated or array)
-            'name'            => 'david,uwe,frank',
+            'name'            => 'david,uwe,frank',   // several rows with the same data
             'is_enabled'      => 1,
-            '#sync_relations' => [
-                'aclGroups' => ['Members'],
-            ],
+            '#sync_relations' => ['aclGroups' => ['Members']],
         ],
     ],
 ];
 ```
 
-Run the imports:
+Run them (again after changing your data):
 
-```
-# with everything else (only deployments not done yet)
-sail artisan deploy-env:terraform-modules
-
-# business imports only, again (after changing your data)
+```bash
 sail artisan deploy-env:terraform-modules --module_name=local:business-imports --force
 ```
 
-All options (`can_create`, `can_update`, `ignore_update_fields`, `auto_delete`, `unique_separator`,
-relation types, `raw_sql`, `artisan`, ...) are described in the
-[DeployEnv README](Modules/DeployEnv/README.md#model-definition-cmd-models).
+Order matters: imports with `can_create => false` only find users the LDAP sync has already created, so run
+`ldap:sync-all` first. All options (`ignore_update_fields`, `unique_separator`, relation types, `raw_sql`, `artisan`, ...):
+[DeployEnv README](https://github.com/aklebe-laravel/deploy-env-module#model-definition-cmd-models).
 
-### Build the image for production
+**Secrets in imports** are env vars like all other secrets: `env: { MY_API_TOKEN: "..." }` in `secrets.yaml`, mapped in
+the module config (`'token' => env('MY_API_TOKEN')`), read in the import with `config('my-module.token')`. Never `env()`
+in an import: once the config is cached it returns nothing there.
 
-Set the release number in `project/config/build.yaml` first (`kernel.version`, e.g. `2.0.1-rc1`),
-check `git` and `build_steps` (`./mercy config --stage=build`). Then run **in your dev folder** (takes several minutes):
+## Workflows
 
-```
-./mercy build
-```
+One rule: **what is checked out in your dev folder stays**. Your IDE switches branches; `./mercy update` only pulls.
+The configs decide what *new* clones start with and what the build takes.
 
-Like the install, `./mercy build --info` lists the steps and `./mercy build <step>` continues at a step.
-
-By default the image is built from **releases**: the latest tag of the scaffold, the versions of `base_requires`
-and `requires`, the libraries of its `composer.lock`. The dev settings of your machine (`local.yaml`) are not used.
-For a test image from a branch see [Workflows](#workflows) (`build_steps.branch`).
-
-The build runs in `storage/docker-builds/prod-build`:
-
-1. check the host PHP version, clean the build folder
-2. git clone the scaffold into the build folder (latest tag, or `build_steps.branch`)
-3. use the build stage of your project (`setup-build.yaml`) as `setup.yaml` of the build
-4. check platform requirements, copy root files, create `.env` from `setup-production.env`
-5. fetch base modules and theme, `composer install --no-dev`, fetch `requires` (`mercy:app require`)
-6. composer install of the module dependencies (optimized autoloader)
-7. `npm ci`, `deploy-env:build-mercy-assets`, `npm run build`
-8. remove build-only files (`.env`, `node_modules`, setup configs)
-9. build the Docker image, save it as `.tar.gz`
-10. _[Optional]_ create a bundle (`build_steps.create_bundle`)
-11. _[Optional]_ push to the registry (`build_steps.use_registry`)
-
-Business imports are not part of the image, they are provided on the production server.
-
-### Workflows
-
-One rule: **what is checked out in your dev folder stays** (your IDE switches branches). The configs only decide
-what new clones start with, and what the build takes.
-
-| Repo                               | Comes from                                                         | Change it with                                        |
+| Repository                         | Comes from                                                         | Change it with                                        |
 |------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------|
-| Scaffold, installer                | your `git clone` (tag or branch)                                   | `git checkout` / IDE                                  |
-| Mercy base modules and theme       | `base_requires` of the Mercy defaults: the latest release (`^2.0`) | `git.branch` / `git.branches` in `local.yaml`         |
-| Your modules and themes            | `requires` of your project (`branch: master` or `version: "^1.0"`) | IDE; for new clones `git.branch` / `git.branches`     |
-| Libraries (`mercy-php-deployment`) | `composer.lock` (released tags)                                    | `git.library_paths` or `git.branches` in `local.yaml` |
-| The image (`./mercy build`)        | releases                                                           | `build_steps.branch` (e.g. in an instance)            |
+| scaffold, installer                | your `git clone` (tag or branch)                                   | `git checkout` / IDE                                  |
+| Mercy core and base modules, theme | `base_requires` of the Mercy defaults: latest release (`^2.0`)     | `git.branch` / `git.branches` in `local.yaml`         |
+| your modules and themes            | `requires` of your project (`branch: master` or `version: "^1.0"`) | IDE; for new clones `git.branch` / `git.branches`     |
+| libraries (`mercy-php-deployment`) | `composer.lock` (released tags)                                    | `git.library_paths` or `git.branches` in `local.yaml` |
+| the image (`./mercy build`)        | releases                                                           | `build_steps.branch`                                  |
 
 `project/config/local.yaml` is not versioned and belongs to this machine only. `./mercy` shows what is active.
 
-**Build a project on the Mercy releases** (you work on your own modules only):
+**Build your product on the Mercy releases** (you work on your own modules only): the [Quick start](#quick-start)
+is all you need. Your modules come from `requires`, Mercy's from its tags.
 
-```bash
-git clone --branch v2.3.0 https://github.com/aklebe-laravel/mercy-scaffold.git . && git clone <your-project> project
-composer install && ./mercy install --instance=dev
-```
-
-Your modules come from `requires` (e.g. `master`), Mercy's from its tags. Feature branch of your module: switch it in the IDE.
-
-**Work on the Mercy base** (all repos on `master`):
+**Work on the Mercy base itself** (all repositories on `master`):
 
 ```yaml
 # project/config/local.yaml
@@ -427,13 +365,13 @@ git:
   branch: master
 ```
 
-Clone the scaffold (and the installer) from `master`, then `./mercy update`. New clones and clones on a tag move to
-`master`, clones on a branch keep it.
+Check out the scaffold on `master`, then `./mercy update`. New clones and clones on a tag move to `master`, clones on a
+branch keep it.
 
-**A feature across several repos** (`feature-x` in a few modules): switch them in the IDE, nothing to configure.
-On a fresh machine or test VM: `git.branch: feature-x` (repos without it take `master` / their release).
+**A feature across several repositories:** switch them to `feature-x` in the IDE, nothing to configure. On a fresh
+machine: `git.branch: feature-x` (repositories without that branch take `master` or their release).
 
-**Develop a library next to the project** (its own PhpStorm project, any branch):
+**Develop a library next to the project** (its own IDE project, any branch):
 
 ```yaml
 git:
@@ -441,44 +379,169 @@ git:
     mercy-php-deployment: ../MercyPhpDeployment
 ```
 
-`./mercy update` copies it into the scaffold (`storage/app/library-branch/`, the container sees only the scaffold);
-after changes in the library: `./mercy library:sync`.
-A pushed library branch instead: `git.branches: { mercy-php-deployment: feature-x }`. Do not commit `composer.lock` meanwhile.
+`./mercy update` copies it into `storage/app/library-branch/` (the container only sees the scaffold folder); after a
+change in the library run `./mercy library:sync`. A pushed branch instead: `git.branches: { mercy-php-deployment: feature-x }`. **Do not commit `composer.lock` while one of these is active**;`./mercy`
+shows a red warning if the lock points to a
+local library.
 
-**Test image from a branch** (INT/STAGE, not a release):
+**Test image from a branch** (staging, not a release):
 
 ```yaml
-# project/config/instances/vm-dev.yaml (the machine that builds)
+# project/config/instances/vm-dev.yaml (the instance that builds)
 build_steps:
   branch: feature-x
 ```
 
-`./mercy build` takes scaffold, modules, themes and libraries from `feature-x` where they have it (the rest from
-`master` / releases) and tags the image `<version>-feature-x`. Run it on the test server with that version in its
-instance (`kernel.version: 2.3.0-feature-x`).
+`./mercy build` takes scaffold, modules, themes and libraries from `feature-x` where they have it (the rest from their
+release) and tags the image `<version>-feature-x`. Run it on the test server with `kernel.version: "2.3.0-feature-x"`
+in its instance. Remove `build_steps.branch` afterwards.
 
-**Release** (Mercy team): push everything, then in `git-scripts`:
+## Build the production image
+
+1. Set the release number in `project/config/build.yaml` (`kernel.version`, e.g. `1.4.0`) and commit it.
+2. Check the build config: `./mercy config --stage=build`.
+3. Build in your dev folder (takes several minutes):
 
 ```bash
-./bin/mercy-migrate verify                    # which repos are ahead of their latest tag
-./bin/mercy-migrate tag patch --apply         # or minor / major: only repos with new commits get a tag
-composer update aklebe-laravel/mercy-php-deployment   # in scaffold and installer, if the library got one
+./mercy build                # --info lists the steps, ./mercy build <step> continues
 ```
 
-### Install on production
+By default the image is built from **releases**: the latest tag of the scaffold, the versions in `base_requires` and
+`requires`, the libraries of `composer.lock`. Your `local.yaml` is ignored. Tag your repositories before a release build.
 
-Use the **Mercy-Installer** on your production server and follow its README. It has the same layout as
-the scaffold (`project/`, `resources/setup/`, `storage/app/last-setup/`) and uses the same project repository (stage `prod`). Business imports run by:
+The build works in `storage/docker-builds/prod-build`: it clones the scaffold, applies the build stage, installs
+dependencies without dev packages, builds the frontend, writes `build.lock.yaml`, removes build-only files, builds and
+saves the image and, depending on `build_steps`, creates an offline bundle and pushes to the registry (`<git.registry_source>/<git.registry_namespace>/<image>:<version>`). The registry login is asked
+for once, before
+anything is built.
 
+Business imports and secrets are never part of the image.
+
+## Production
+
+Install the image on a server with the [Mercy-Installer](https://github.com/aklebe-laravel/mercy-installer). It has the
+same layout as the scaffold (`project/`, `resources/setup/`, `storage/app/last-setup/`), uses the same project
+repository with the stage `prod`, and takes `compose.yaml` and the templates out of the image, so they always match the
+release.
+
+```bash
+git clone https://github.com/aklebe-laravel/mercy-installer.git . && git clone <your-project-repository> project
+composer install && ./mercy install --instance=<name>
 ```
-docker compose exec mercy.app php artisan deploy-env:terraform-modules --module_name=local:business-imports --force
+
+New release: change `kernel.version` of the instance (or `prod.yaml`), `git -C project pull`, `./mercy update`.
+
+## Using your own git server
+
+All code and `composer.json` files use the GitHub URLs of `aklebe-laravel`. To fetch from your own server instead (e.g. a Gitea that mirrors to GitHub), add rewrites to the config of your network:
+
+```yaml
+# project/config/networks/home.yaml
+git:
+  url_rewrites:
+    - base: "gitea@git.example.com:aklebe-laravel/"
+      instead_of: [ "https://github.com/aklebe-laravel/", "git@github.com:aklebe-laravel/" ]
+ssh:
+  known_hosts: [ github.com, git.example.com ]
+  fingerprints:
+    git.example.com: 'SHA256:...'   # on the server: ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
 ```
 
-### Docker maintenance
+`install`, `update` and `build` (step `setup_host`) then set the `insteadOf` rewrites in the global git config of the
+machine and inside the containers, add the server to `~/.ssh/known_hosts` (only with a matching fingerprint) and test
+the access. When the base changes, the old rewrite is removed automatically. Without `url_rewrites` everything comes
+from GitHub.
 
-#### Docker config
+One key per machine: the deploy key `ssh.key` is used by the containers and by every git and composer call of the
+deployment (`GIT_SSH_COMMAND`). Your own git commands keep using your personal key.
 
-Recommended `/etc/docker/daemon.json`:
+## Versions and releases
+
+A version belongs to an image, not to an environment:
+
+| Stage      | Version                                                                        |
+|------------|--------------------------------------------------------------------------------|
+| dev        | no fixed number: `git describe` of the project, e.g. `v1.4.0-3-g1a2b3c4-dirty` |
+| build      | `kernel.version` in `build.yaml`: image tag, `APP_VERSION`, image labels       |
+| production | `kernel.version` in `prod.yaml` or the instance: the release to run            |
+
+`sail artisan mercy:info` shows what really runs. Keep `kernel.version` out of `setup.yaml` and `dev.yaml`, otherwise it
+overrides the git version in dev.
+
+Mercy itself is released per repository (each has its own version). Releases of the Mercy repositories are tagged on the
+internal Gitea and mirrored to GitHub with the `mercy-migrate` tool of the Mercy team.
+
+## Development reference
+
+| Task                                        | Command                                                                                  |
+|---------------------------------------------|------------------------------------------------------------------------------------------|
+| start / stop containers                     | `sail up -d` / `sail down`                                                               |
+| rebuild containers                          | `sail build --no-cache`                                                                  |
+| Vite dev server                             | `sail npm run dev`                                                                       |
+| shell in the app container                  | `sail shell`                                                                             |
+| URLs, ports and important env values        | `sail artisan mercy:info`                                                                |
+| composer, npm, clear caches, build frontend | `sail artisan mercy:app update`                                                          |
+| clear caches and views                      | `sail artisan mercy:app cache,view`                                                      |
+| build frontend                              | `sail artisan mercy:app build-frontend`                                                  |
+| clone / update modules and themes           | `sail artisan mercy:app require`                                                         |
+| migrations and all deployments              | `sail artisan mercy:app migrate`                                                         |
+| everything after bigger changes             | `sail artisan mercy:app migrate,build-frontend,cache,view`                               |
+| run new deployments of modules and imports  | `sail artisan deploy-env:terraform-modules`                                              |
+| run business imports again                  | `sail artisan deploy-env:terraform-modules --module_name=local:business-imports --force` |
+| modules ordered by priority                 | `sail artisan deploy-env:module-info`                                                    |
+| IDE helper files                            | `sail artisan mercy:app ide`                                                             |
+
+All `mercy:app` services and `deploy-env:*` commands: [DeployEnv README](https://github.com/aklebe-laravel/deploy-env-module#console).
+
+**New module** from the stubs of DeployEnv:
+
+```bash
+sail artisan deploy-env:make-module MyModule
+```
+
+**Model, form and data table classes** (with the Form and DataTable modules):
+
+```bash
+sail artisan deploy-env:former MyModule --classes=country,some-thing
+```
+
+This creates `app/Models/Country.php`, `app/Forms/Country.php`, `app/Http/Livewire/Form/Country.php` and
+`app/Http/Livewire/DataTable/Country.php` in the module (existing files are not changed). Without `--classes`, all
+models of the module are used. Other modules can add files by listening to the event `DeployEnvFormer`.
+
+`sail` alias:
+
+```bash
+echo "alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'" >> ~/.bashrc
+```
+
+## Folder structure
+
+| Path                      | Meaning                                                                               |
+|---------------------------|---------------------------------------------------------------------------------------|
+| `mercy`                   | the CLI                                                                               |
+| `project/`                | **your project repository**, the only place to edit configs                           |
+| `Modules/`, `themes/`     | cloned modules and themes (own git repositories, not part of the scaffold)            |
+| `resources/setup/`        | scaffold templates: new project, `setup-*.env`, `.env.minimal`, `core.yaml`, nginx    |
+| `resources/production/`   | `compose.yaml` of production (copied out of the image by the installer)               |
+| `storage/app/last-setup/` | generated: merged configs and envs of this machine (fixed keys and ports), never edit |
+| `install/project-root/`   | files copied to the project root during install and build                             |
+| `docker/`                 | Dockerfile, nginx and PHP config, `start-container`                                   |
+| `storage/docker-builds/`  | build folder of the production image                                                  |
+
+## Maintenance
+
+**Remove an installation:**
+
+```bash
+./mercy destroy                    # containers, networks, volumes (the DATABASE), proxy hosts, images built here
+./mercy destroy --images --files   # also pulled images and all files of the folder
+```
+
+`destroy` reads the project name from Docker, asks you to type it and, with `--files`, refuses while a repository in the
+folder (scaffold, `project/`, modules, themes) has uncommitted or unpushed changes. `--force` skips both checks.
+
+**Recommended `/etc/docker/daemon.json`** (log rotation, build cache limit):
 
 ```json
 {
@@ -499,24 +562,18 @@ Recommended `/etc/docker/daemon.json`:
 }
 ```
 
-#### Remove everything
+## Troubleshooting
 
-```
-# containers, networks and volumes (the DATABASE) of this folder, images built here
-./mercy destroy
+| Situation                                  | What to do                                                                                   |
+|--------------------------------------------|----------------------------------------------------------------------------------------------|
+| not sure what state the installation is in | `./mercy`                                                                                    |
+| a step failed                              | fix the cause, then `./mercy <command> <step>`; config-preparing steps always run again      |
+| a setting seems to be ignored              | `./mercy config <key>` shows the value and its origin; check the warnings about unknown keys |
+| the install waits for a deploy key         | add the shown public key at your git server; the install tests again                         |
+| "an instance is required"                  | `./mercy <command> --instance=<tab>`                                                         |
+| ports collide with another project         | set another `provisioning.auto_port_start` in the instance, then `./mercy update`            |
+| `composer.lock` warning in `./mercy`       | the lock points to a local library: remove it from `local.yaml`, `./mercy update`, commit    |
 
-# also the pulled images (app image, mariadb, redis) and/or all files of the folder
-./mercy destroy --images --files
-```
+## License
 
-`destroy` uses the docker project name of the `.env` and asks you to type it. With `--files` it refuses
-as long as a git repo in the folder (scaffold, `project/`, modules, themes) has uncommitted or unpushed changes.
-`--force` skips both checks (for scripts).
-
-### Tips
-
-#### sail alias
-
-```
-echo "alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'" >> ~/.bashrc
-```
+MIT, see [LICENSE.md](LICENSE.md).
