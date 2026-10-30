@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "aklebe-laravel/mercy-php-deployment",
-            "version": "v2.2.0",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aklebe-laravel/mercy-php-deployment.git",
-                "reference": "c46142a8b55049ec25f6bb9a023bf927d131adad"
+                "reference": "910cdba7d569f5d44c6b2e8f200962061427be7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aklebe-laravel/mercy-php-deployment/zipball/c46142a8b55049ec25f6bb9a023bf927d131adad",
-                "reference": "c46142a8b55049ec25f6bb9a023bf927d131adad",
+                "url": "https://api.github.com/repos/aklebe-laravel/mercy-php-deployment/zipball/910cdba7d569f5d44c6b2e8f200962061427be7a",
+                "reference": "910cdba7d569f5d44c6b2e8f200962061427be7a",
                 "shasum": ""
             },
             "require": {
@@ -56,7 +56,7 @@
                 "MIT"
             ],
             "description": "Isolated deployment for your main application.",
-            "time": "2026-10-30T05:56:16+00:00"
+            "time": "2026-10-30T11:25:36+00:00"
         },
         {
             "name": "alizharb/laravel-themer",
