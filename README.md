@@ -123,6 +123,7 @@ build on this machine (the deployment sets `GIT_SSH_COMMAND`). Your own git comm
    ```
    Show all steps by `./mercy install --info`. Continue at a specific step (after an error)
    by `./mercy install 12` (step number or name).
+   `./mercy` alone shows where this installation stands and the next step.
    `./mercy` works like Laravel's `artisan`, also as `php mercy`. The install sets up tab completion (bash):
    in a new terminal `./mercy install --instance=<tab>` (only with `./mercy`, not with `php mercy`).
 
