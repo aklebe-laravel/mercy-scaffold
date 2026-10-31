@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite';
+import {defineConfig} from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
-import { resolve } from 'node:path';
+import {resolve} from 'node:path';
 
 export default defineConfig({
     plugins: [
@@ -32,6 +32,18 @@ export default defineConfig({
             clientPort: 443,
             protocol: 'wss',
             path: 'vite-hmr',
+        },
+        // Vite watches the whole project root by default. vendor/ and storage/ alone are tens of thousands of files and
+        // exhaust the inotify limit of the host (shared by all containers): ENOSPC "System limit for number of file
+        // watchers reached". Blade views, modules and themes stay watched; storage/app/mercy-generated too (imported).
+        watch: {
+            ignored: [
+                /\/vendor\//,
+                /\/storage\/(?!app\/mercy-generated\/)/,
+                /\/bootstrap\/cache\//,
+                /\/public\/(build|storage|themes)\//,
+                /\/\.(idea|junie|phpunit\.cache)\//,
+            ],
         },
         host: '0.0.0.0',
         port: process.env.VITE_PORT ? parseInt(process.env.VITE_PORT) : 5173,
