@@ -60,8 +60,10 @@ return [
     |
     */
     'auto_namespaces' => [
-        'layouts' => 'resources/views/layouts',
-        'pages'   => 'resources/views/livewire/pages',
+        'layouts'  => 'resources/views/layouts',
+        'pages'    => 'resources/views/livewire/pages',
+        // anonymous components like <x-theme-ui::pagination.item/>, child theme first, then its parents
+        'theme-ui' => 'resources/views/components',
     ],
 
     'preview'   => [

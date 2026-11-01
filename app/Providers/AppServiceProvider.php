@@ -8,9 +8,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\View;
 use Livewire\Livewire;
 use Modules\SystemBase\app\Providers\Base\BaseServiceProvider;
 use Modules\SystemBase\app\Services\ModuleService;
@@ -55,18 +53,6 @@ class AppServiceProvider extends BaseServiceProvider
 
         if (config('app.force_https', false)) { // Default value should be false for local server
             URL::forceScheme('https');
-        }
-
-        // Theme-Fallback for views (layouts.master)
-        $activeTheme = config('themer.active', 'default');
-        $themeViewsPath = base_path("themes/{$activeTheme}/resources/views");
-
-        if (is_dir($themeViewsPath)) {
-            View::addLocation($themeViewsPath);
-            $componentsPath = $themeViewsPath.'/components';
-            if (is_dir($componentsPath)) {
-                Blade::anonymousComponentPath($componentsPath, 'theme-ui');
-            }
         }
 
         // @vite-Direktive without themer
