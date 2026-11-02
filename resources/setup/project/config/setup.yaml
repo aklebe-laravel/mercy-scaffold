@@ -2,7 +2,8 @@
 # every key with its default and an explanation is in vendor/aklebe-laravel/mercy-php-deployment/resources/defaults/setup.yaml,
 # "./mercy config --all" shows them all, "--redundant" the values here that equal a default.
 #
-# Layers: Mercy defaults -> setup.yaml -> networks/*.yaml -> <stage>.yaml -> secrets.yaml (not versioned)
+# Layers: Mercy defaults -> setup.yaml -> <stage>.yaml (+ its extends) -> secrets.yaml (not versioned)
+#         -> instances/<name>.yaml with its network (wins over secrets.yaml) -> local.yaml (not versioned)
 kernel:
   # docker image (if "image" is not set) and container prefix
   name: "my-product"
