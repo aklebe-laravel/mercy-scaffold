@@ -8,6 +8,10 @@ kernel:
   name: "my-product"
   # image: "my-product-web"
   # theme: "my-theme"
+  # image version from the tags in the registry: the build takes the next release (jump with
+  # "./mercy build --tag=3" or "--tag=2.7"), production the newest release on every "./mercy update".
+  # A server that must stay on a release sets its number in prod.yaml or its instance file.
+  version: "auto"
 
 git:
   # owner of the product image in the registry: ghcr.io/<registry_namespace>/<image>:<version>

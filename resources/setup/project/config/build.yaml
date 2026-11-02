@@ -3,6 +3,5 @@
 # never with the domain of a production instance.
 # env "production" and dev_mode false come from the Mercy build defaults (set them here again if your dev.yaml sets them).
 extends: [ setup.yaml, dev.yaml ]
-kernel:
-  # Release number of the image (image tag, APP_VERSION, build.lock.yaml): letters, digits, ".", "_", "-".
-  version: "2.0.0"
+# The release number of the image comes from "kernel.version: auto" (setup.yaml): the next release in the registry,
+# "./mercy build --tag=3" (or 2.7, 2.7.0) jumps. A fixed "kernel.version" here would replace auto for every build.

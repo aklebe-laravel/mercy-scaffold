@@ -8,8 +8,8 @@ everything that makes this project different from the scaffold. Created by `./me
 | `config/setup.yaml`   | the product (name, image, theme, modules, ...)                  |
 | `config/networks/`    | settings of a network/site (own git server, NPM, LDAP, DNS)     |
 | `config/dev.yaml`     | differences of the dev environment                              |
-| `config/build.yaml`   | differences of the production image (release number)            |
-| `config/prod.yaml`    | differences of the production server (release to run)           |
+| `config/build.yaml`   | differences of the production image                             |
+| `config/prod.yaml`    | differences of the production server (pinned release, optional) |
 | `config/secrets.yaml` | passwords and keys of this machine, **not versioned**           |
 | `business_imports/`   | data imports (their secrets: env vars in `config/secrets.yaml`) |
 
@@ -19,6 +19,11 @@ Mercy version brings new settings without changing them. Unknown keys (typos, ol
 Maps are merged key by key, lists (like `requires`) are replaced as a whole.
 A stage file can inherit more files, e.g. settings of your network: `extends: [ setup.yaml, networks/home.yaml ]`.
 The domain belongs to the instance, so it is set in the stage files.
+
+Release numbers: `kernel.version: "auto"` in `setup.yaml` takes them from the image tags in the registry. `./mercy build`
+builds the next release (`2.0.5` → `2.0.6`), `./mercy build --tag=3` / `--tag=2.7` / `--tag=2.7.0` jumps (an existing
+release is never built again), and production runs the newest release on every `./mercy update`. Pin a server that
+must stay on a release in its `prod.yaml` or instance file (`kernel.version: "2.0.6"`).
 
 Secrets: `config/secrets.yaml` exists only on the machine (not versioned). Values that may be versioned (e.g. the
 password of a local dev tool) go into a file ending with `-secrets.yaml`, e.g. `config/shared-secrets.yaml`, inherited

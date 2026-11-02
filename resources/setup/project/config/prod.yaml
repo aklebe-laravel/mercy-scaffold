@@ -3,5 +3,6 @@
 kernel:
   # domain of this instance, without http://
   domain: "mercy.my-domain.de"
-  # the release to run (image tag); change it and run "./mercy update" to switch releases
-  version: "2.0.0"
+  # the release to run: "auto" (setup.yaml) = the newest release on every "./mercy update".
+  # Pin a real server to a release (switch: change it and run "./mercy update"):
+  # version: "2.0.0"
